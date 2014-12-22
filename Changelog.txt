@@ -1,0 +1,21 @@
+v0.0.1
+ + Added Hornet
+ + Added Minor Fiend
+ + Added animation for Minor Fiend
+ + Added default image
+ + Added attacks
+ + Added skills
+ + Added items
+ + Added Bite
+ + Added Punch
+ + Added Sting
+ + Added Paranoia
+ + Added Run Away
+ + Added Attack Up
+ + Added battle screen
+ + Added pause menu
+ + Added stats
+ + Added elements
+ + Added installer
+v0.0.2
+ * .bat file now works without Path variable set

@@ -1,0 +1,56 @@
+{
+  "default":{
+    "target":null,
+    "effect":[],
+    "can_target_self":null,
+    "can_target_fainted":null
+  },
+  "Health Potion":{
+    "target":"ally",
+    "effect":[
+      ["health_mod",20]
+    ],
+    "can_target_self":true,
+    "can_target_fainted":false
+  },
+  "Energy Potion":{
+    "target":"ally",
+    "effect":[
+      ["energy_mod",20]
+    ],
+    "can_target_self":true,
+    "can_target_fainted":false
+  },
+  "Smoke Bomb":{
+    "target":null,
+    "effect":[
+      ["escape",70]
+    ],
+    "can_target_self":null,
+    "can_target_fainted":null
+  },
+  "Small Stone":{
+    "target":"entity",
+    "effect":[
+      ["health_mod",-5]
+    ],
+    "can_target_self":false,
+    "can_target_fainted":false
+  },
+  "Energy Drain":{
+    "target":"entity",
+    "effect":[
+      ["energy_mod",-5]
+    ],
+    "can_target_self":false,
+    "can_target_fainted":false
+  },
+  "Revival Token":{
+    "target":"ally",
+    "effect":[
+      ["health_mod",10]
+    ],
+    "can_target_self":false,
+    "can_target_fainted":true
+  }
+}
