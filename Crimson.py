@@ -8,7 +8,7 @@ import copy
 import pickle
 
 # Define Constants
-BLACK = (0,0,0)
+BLACK = (  0,  0,  0)
 WHITE = (255,255,255)
 LMB = 1
 RMB = 3
@@ -175,8 +175,8 @@ class Crimson(object):
                 self.party[x] = len(self.allies) - 1
                 break
 
-    def add_enemy(self, enemy):
-        enemy.team = "wild"
+    def add_enemy(self, enemy, team="wild"):
+        enemy.team = team
         for x in [1,0,2]:
             if self.enemies[x] is None:
                 self.enemies[x] = enemy
@@ -222,7 +222,6 @@ class Crimson(object):
             self.player_turn()
 
     def end_battle(self, result="", special_text=""):
-
         if result == "win":
             print "\nYou have defeated the enemy!"
         elif result == "lose":
@@ -619,11 +618,11 @@ class Crimson(object):
                                 self.menu_open = False
                                 load_game(pressed)
                             elif pressed == "Battle" or pressed == "Begin Battle":
-                                enemy_minor_fiend = Entity("Minor Fiend", 2)
+                                enemy_minor_fiend = Entity("Minor Fiend")#, 2)
                                 game.add_enemy(enemy_minor_fiend)
-                                enemy_hornet = Entity("Hornet", 25)
+                                enemy_hornet = Entity("Hornet")#, 25)
                                 game.add_enemy(enemy_hornet)
-                                #enemy_hornet2 = Entity("Hornet", 2)
+                                #enemy_hornet2 = Entity("Hornet")#, 2)
                                 #game.add_enemy(enemy_hornet2)
                                 self.in_battle = True
                                 menu_open = False
@@ -720,7 +719,7 @@ class Crimson(object):
                                 elif self.bs_button_state == 2:
                                     if self.bs_selected_ally.attack_list[pressed[1]] is not None:
                                         self.bs_selected_action = self.bs_selected_ally.attack_list[pressed[1]]
-                                        if self.bs_selected_action.target is not None:
+                                        if self.bs_selected_action.target != []:
                                             self.bs_selected_button = pressed[1]
                                         else:
                                             if self.bs_selected_action.can_target(self.bs_selected_ally, None):
@@ -735,7 +734,7 @@ class Crimson(object):
                                     if self.bs_selected_ally.skill_list[pressed[1]] is not None:
                                         self.bs_selected_action = self.bs_selected_ally.skill_list[pressed[1]]
                                         # If skill requires target.
-                                        if self.bs_selected_action.target is not None:
+                                        if self.bs_selected_action.target != []:
                                             self.bs_selected_button = pressed[1]
                                         else:
                                             if self.bs_selected_action.can_target(self.bs_selected_ally, None):
@@ -760,7 +759,7 @@ class Crimson(object):
                                         self.bs_selected_action = [1,0,2][pressed[1]] + 3 * self.bs_item_page
                                         if self.bs_selected_action < len(self.items):
                                             self.bs_selected_action = self.items[self.bs_selected_action]
-                                            if self.bs_selected_action.target is not None:
+                                            if self.bs_selected_action.target != []:
                                                 self.bs_selected_button = pressed[1]
                                             else:
                                                 if self.bs_selected_action.can_target(self.bs_selected_ally, None):
@@ -884,7 +883,6 @@ class Entity(object):
                         entity_images[self.original_name][img_type] = [pygame.transform.smoothscale(file, wp(settings.bs_id_box_x, settings.bs_id_box_y))]
             else:
                 for img_type in settings.entity_img_types:
-                    print img_type
                     entity_images[self.original_name][img_type] = [pygame.image.load(img_dir + "default.png")]
                     entity_images[self.original_name][img_type][0] = pygame.transform.smoothscale(entity_images[self.original_name][img_type][0], wp(settings.bs_id_box_x, settings.bs_id_box_y))
 
@@ -1061,8 +1059,6 @@ class Attack(object):
         self.element =            attacks[name]["element"]         # "N/A", "Psn", "Drk"
         self.energy_cost =        attacks[name]["energy_cost"]
         self.target =             attacks[name]["target"]          # Always "enemy" or "all_enemies"?
-        self.can_target_self =    attacks[name]["can_target_self"] # Always False?
-        self.can_target_fainted = attacks[name]["can_target_fainted"]
 
     def use(self, user, target=None):
         if user.can_battle():
@@ -1076,7 +1072,17 @@ class Attack(object):
                 else:
                     hit = random.randint(1, 100) < self.accuracy
                 if hit:
-                    target.take_damage(self.damage)
+                    if self.type == "Str":
+                        dmg = (self.damage + user.strength) / 3.0
+                        # Remove dmg for target def.
+                    elif self.type == "Int":
+                        dmg = (self.damage + user.intelligence) / 3.0
+                        # Remove dmg for target int.
+                    elif self.type == "Elm":
+                        dmg = (self.damage + user.strength) / 3.0
+                        # Modify dmg based on attack, user, and target elm.
+                        # Remove dmg for target def.
+                    target.take_damage(dmg)
                 else:
                     print "The attack missed!"
                 game.has_acted.append(user)
@@ -1086,40 +1092,31 @@ class Attack(object):
             print user.name, "is unable to battle!"
 
     def can_target(self, user, target):
-        if self.target == "enemy":
-            if user.team != target.team:
-                if target.is_fainted:
-                    if self.can_target_fainted:
-                        return True
-                else:
-                    return True
-        elif self.target == "ally":
-            if user.team == target.team:
-                if user is target:
-                    if self.can_target_self:
-                        return True
-                elif target.is_fainted:
-                    if self.can_target_fainted:
-                        return True
-                else:
-                    return True
-        elif self.target == "entity":
-            if user is target:
-                if self.can_target_self:
-                    return True
-            elif target.is_fainted:
-                if self.can_target_fainted:
-                    return True
-            else:
-                return True
-        elif target is None:
-            if self.target is None:
-                return True
-        elif self.target == "self":
-            if user is target:
-                return True
-        elif self.target == "all_allies" or self.target == "all_enemies":
+        if len(self.target) == 0: # If target is not required.
             return True
+        for potential_target in self.target:
+            if potential_target == "enemy":
+                if user.team != target.team:
+                    if not target.is_fainted:
+                        return True
+            elif potential_target == "ally":
+                if user.team == target.team:
+                    if not target.is_fainted:
+                        if target is not user:
+                            return True
+            elif potential_target == "fainted_enemy":
+                if user.team != target.team:
+                    if target.is_fainted:
+                        return True
+            elif potential_target == "fainted_ally":
+                if user.team == target.team:
+                    if target.is_fainted:
+                        return True
+            elif potential_target == "self":
+                if user is target:
+                    return True
+            elif potential_target == "all_allies" or potential_target == "all_enemies" or potential_target == "all":
+                return True
         return False
 
 class Skill(object):
@@ -1135,10 +1132,8 @@ class Skill(object):
             name = "default"
 
         self.energy_cost =        skills[name]["energy_cost"]      # Skills cannot increase self.energy, only items can.
-        self.target =             skills[name]["target"]           # "ally", "all_allies", "enemy", "all_enemies", "self", "entity", or null. # Maybe "closest_enemy" and "furthest_enemy"?
-        self.can_target_self =    skills[name]["can_target_self"]  # If this is True and target is "all_allies", self will also be included.
+        self.target =             skills[name]["target"]           # "ally", "all_allies", "fainted_ally", "enemy", "all_enemies", "fainted_enemy", "self", or empty. # Maybe "closest_enemy" and "furthest_enemy"?
         self.effect =             skills[name]["effect"]           # See Notes.txt:Effects
-        self.can_target_fainted = skills[name]["can_target_fainted"]
 
     def use(self, user, target=None):
         if user.can_battle():
@@ -1163,40 +1158,31 @@ class Skill(object):
             print user.name, "is unable to battle!"
 
     def can_target(self, user, target):
-        if self.target == "enemy":
-            if user.team != target.team:
-                if target.is_fainted:
-                    if self.can_target_fainted:
-                        return True
-                else:
-                    return True
-        elif self.target == "ally":
-            if user.team == target.team:
-                if user is target:
-                    if self.can_target_self:
-                        return True
-                elif target.is_fainted:
-                    if self.can_target_fainted:
-                        return True
-                else:
-                    return True
-        elif self.target == "entity":
-            if user is target:
-                if self.can_target_self:
-                    return True
-            elif target.is_fainted:
-                if self.can_target_fainted:
-                    return True
-            else:
-                return True
-        elif target is None:
-            if self.target is None:
-                return True
-        elif self.target == "self":
-            if user is target:
-                return True
-        elif self.target == "all_allies" or self.target == "all_enemies":
+        if len(self.target) == 0: # If target is not required.
             return True
+        for potential_target in self.target:
+            if potential_target == "enemy":
+                if user.team != target.team:
+                    if not target.is_fainted:
+                        return True
+            elif potential_target == "ally":
+                if user.team == target.team:
+                    if not target.is_fainted:
+                        if target is not user:
+                            return True
+            elif potential_target == "fainted_enemy":
+                if user.team != target.team:
+                    if target.is_fainted:
+                        return True
+            elif potential_target == "fainted_ally":
+                if user.team == target.team:
+                    if target.is_fainted:
+                        return True
+            elif potential_target == "self":
+                if user is target:
+                    return True
+            elif potential_target == "all_allies" or potential_target == "all_enemies" or potential_target == "all":
+                return True
         return False
 
 class Item(object):
@@ -1213,8 +1199,6 @@ class Item(object):
 
         self.target =             items[name]["target"]
         self.effect =             items[name]["effect"]
-        self.can_target_self =    items[name]["can_target_self"]
-        self.can_target_fainted = items[name]["can_target_fainted"]
 
     def use(self, user, target=None):
         if user.can_battle():
@@ -1241,40 +1225,31 @@ class Item(object):
             print user.name, "is unable to battle!"
 
     def can_target(self, user, target):
-        if self.target == "enemy":
-            if user.team != target.team:
-                if target.is_fainted:
-                    if self.can_target_fainted:
-                        return True
-                else:
-                    return True
-        elif self.target == "ally":
-            if user.team == target.team:
-                if user is target:
-                    if self.can_target_self:
-                        return True
-                elif target.is_fainted:
-                    if self.can_target_fainted:
-                        return True
-                else:
-                    return True
-        elif self.target == "entity":
-            if user is target:
-                if self.can_target_self:
-                    return True
-            elif target.is_fainted:
-                if self.can_target_fainted:
-                    return True
-            else:
-                return True
-        elif target is None:
-            if self.target is None:
-                return True
-        elif self.target == "self":
-            if user is target:
-                return True
-        elif self.target == "all_allies" or self.target == "all_enemies":
+        if len(self.target) == 0: # If target is not required.
             return True
+        for potential_target in self.target:
+            if potential_target == "enemy":
+                if user.team != target.team:
+                    if not target.is_fainted:
+                        return True
+            elif potential_target == "ally":
+                if user.team == target.team:
+                    if not target.is_fainted:
+                        if target is not user:
+                            return True
+            elif potential_target == "fainted_enemy":
+                if user.team != target.team:
+                    if target.is_fainted:
+                        return True
+            elif potential_target == "fainted_ally":
+                if user.team == target.team:
+                    if target.is_fainted:
+                        return True
+            elif potential_target == "self":
+                if user is target:
+                    return True
+            elif potential_target == "all_allies" or potential_target == "all_enemies" or potential_target == "all":
+                return True
         return False
 
 ### ADD THESE TO ENTITY ###
@@ -1332,7 +1307,7 @@ def start_game(data=None):
         player = Entity(settings.player_name)
         game = Crimson(player)
         game.items = [Item("Health Potion"), Item("Energy Potion"), Item("Smoke Bomb"), Item("Small Stone", 3), Item("Energy Drain"), Item("Revival Token")] # game.add_item(self, item)
-        minor_fiend = Entity("Minor Fiend", 10)
+        minor_fiend = Entity("Minor Fiend")#, 10)
         game.add_ally(minor_fiend)
         #hornet = Entity("Hornet")
         #game.add_ally(hornet)

@@ -1,64 +1,50 @@
 {
   "default":{
     "energy_cost":4,
-    "target":"enemy",
-    "can_target_self":false,
-    "effect":[],
-    "can_target_fainted":false
+    "target":["enemy"],
+    "effect":[]
   },
   "Confuse":{
     "energy_cost":4,
-    "target":"enemy",
-    "can_target_self":false,
-    "effect":[],
-    "can_target_fainted":false
+    "target":["enemy"],
+    "effect":[]
   },
   "Swarm":{
     "energy_cost":6,
-    "target":null,
-    "can_target_self":null,
-    "effect":[],
-    "can_target_fainted":null
+    "target":[],
+    "effect":[]
   },
   "Run Away":{
     "energy_cost":0,
-    "target":null,
-    "can_target_self":null,
+    "target":[],
     "effect":[
       ["escape",40]
-    ],
-    "can_target_fainted":null
+    ]
   },
   "Intimidate":{
     "energy_cost":3,
-    "target":"enemy",
-    "can_target_self":false,
+    "target":["enemy"],
     "effect":[
       ["stat_mod","defense",-5],
       ["stat_mod","agility",2]
-    ],
-    "can_target_fainted":false
+    ]
   },
   "Paranoia":{
     "energy_cost":6,
-    "target":"enemy",
-    "can_target_self":false,
+    "target":["enemy"],
     "effect":[
       ["stat_mod","strength",-3],
       ["stat_mod","defense",5],
       ["stat_mod","dexterity",-3],
       ["stat_mod","agility",-3],
       ["stat_mod","intelligence",-3]
-    ],
-    "can_target_fainted":false
+    ]
   },
   "Attack Up":{
     "energy_cost":6,
-    "target":"ally",
-    "can_target_self":true,
+    "target":["ally","self"],
     "effect":[
       ["stat_mod","strength",5]
-    ],
-    "can_target_fainted":false
+    ]
   }
 }

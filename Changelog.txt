@@ -19,3 +19,6 @@ v0.0.1
  + Added installer
 v0.0.2
  * .bat file now works without Path variable set
+v0.0.3
+ * Improved targetting
+ * Improved damage equation

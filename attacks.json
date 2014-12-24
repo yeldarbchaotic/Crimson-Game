@@ -5,9 +5,7 @@
     "type":"Str",
     "element":"N/A",
     "energy_cost":1,
-    "target":"enemy",
-    "can_target_self":false,
-    "can_target_fainted":false
+    "target":["enemy"]
   },
   "Tackle":{
     "damage":3,
@@ -15,9 +13,7 @@
     "type":"Str",
     "element":"N/A",
     "energy_cost":2,
-    "target":"enemy",
-    "can_target_self":false,
-    "can_target_fainted":false
+    "target":["enemy"]
   },
   "Purge":{
     "damage":8,
@@ -25,9 +21,7 @@
     "type":"Int",
     "element":"Drk",
     "energy_cost":5,
-    "target":"all_enemies",
-    "can_target_self":false,
-    "can_target_fainted":false
+    "target":["all_enemies"]
   },
   "Punch":{
     "damage":4,
@@ -35,9 +29,7 @@
     "type":"Str",
     "element":"N/A",
     "energy_cost":2,
-    "target":"enemy",
-    "can_target_self":false,
-    "can_target_fainted":false
+    "target":["enemy"]
   },
   "Bite":{
     "damage":3,
@@ -45,9 +37,7 @@
     "type":"Str",
     "element":"Drk",
     "energy_cost":2,
-    "target":"enemy",
-    "can_target_self":false,
-    "can_target_fainted":false
+    "target":["enemy"]
   },
   "Sting":{
     "damage":2,
@@ -55,8 +45,6 @@
     "type":"Str",
     "element":"Psn",
     "energy_cost":2,
-    "target":"enemy",
-    "can_target_self":false,
-    "can_target_fainted":false
+    "target":["enemy"]
   }
 }
