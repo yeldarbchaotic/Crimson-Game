@@ -39,10 +39,6 @@ LONG-TERM TO DO:
 NOTES:
  - Replace '[^\S\r]*[^\S\r](?=\r)' with nothing to remove whitespace before newlines.
  - Save on name change.
-
-DONE:
- - Add a non-battle screen.
- - Add "can_target_fainted" key to skills and items. (Boolean)
  
 https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi
 http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi

@@ -953,6 +953,7 @@ class Entity(object):
         elif amount < 0:
             if self.health <= 0:
                 print self.name, "was revived!"
+                self.is_fainted = False
             print self.name, "regained", -amount, "health!"
         else:
             print "Not even a scratch!"
