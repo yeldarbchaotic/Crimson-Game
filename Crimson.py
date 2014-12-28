@@ -7,9 +7,14 @@ import os
 import copy
 import pickle
 
+crimson_version = "v0.0.4"
+
 # Define Constants
 BLACK = (  0,  0,  0)
 WHITE = (255,255,255)
+HPRED = (255,  0,  0)
+MPBLU = (  0,125,255)
+XPGRN = (  0,175,  0)
 LMB = 1
 RMB = 3
 
@@ -34,7 +39,7 @@ class Settings(object):
         self.popup_offset_px = [8, 16]
         self.menu_options = ["Continue", "Save", "Load", "Options", "Quit"]
         self.battle_menu_options = ["End Turn", "Options", "Return to Game", "Quit"] # "Quicksave", "Quickload", "Auto-Battle"?
-        self.menu_options += ["Battle"] #### DEBUG ####
+        self.menu_options += ["Battle", "Add Item"] #### DEBUG ####
         self.entity_img_types = ["full_health", "half_health", "low_health", "fainted", "sleeping"]
         self.entity_animation_wait = 15
 
@@ -51,7 +56,7 @@ print "Loading...",
 # Creates the pygame window.
 pygame.init()
 screen = pygame.display.set_mode(settings.win_size)#, FULLSCREEN)
-pygame.display.set_caption("Crimson - The Game v0.0.1")
+pygame.display.set_caption("Crimson - The Game " + crimson_version)
 #pygame.display.toggle_fullscreen()
 
 # Loads the images and prepares the screen.
@@ -99,9 +104,6 @@ top_right_logo = pygame.transform.smoothscale(logo, (y_x(logo, wp(y=settings.tr_
 font = pygame.font.SysFont("Arial", wp(x=settings.font_size_x))
 entity_images = {}
 saved_games = {}
-for file_name in os.listdir(save_dir):
-    if file_name.endswith(".csav"):
-        saved_games[file_name.strip("csav").strip(".")] = save_dir + file_name
 
 #############################################################################
 #############################################################################
@@ -197,6 +199,10 @@ class Crimson(object):
             print "Couldn't Escape!"
 
     def enemy_turn(self):
+        self.bs_selected_button = None
+        self.bs_selected_action = None
+        self.bs_selected_ally =   None
+        self.bs_button_state = 0
         self.turn[1] = "Enemy"
         print
         enemies_by_speed = []
@@ -606,16 +612,14 @@ class Crimson(object):
                             elif pressed == "Save" or pressed == "Record" or pressed == "Save Game":
                                 really_save = self.draw_start_menu("Would you like to save?", ["Yes", "No"])
                                 if really_save == "Yes":
-                                    save_data = [self.allies, self.party, self.items]#, settings]
-                                    save_file = open(save_dir + str(self.player_team) + ".csav", "w")
-                                    pickle.dump(save_data, save_file)
-                                    save_file.close()
+                                    self.save()
                                     menu_open = False
                             elif pressed == "Load" or pressed == "Load Game":
+                                self.update_profile_list()
                                 self.draw_start_menu("Load:", saved_games.keys() + ["Back"])
+                                menu_open = False
                             elif pressed in saved_games:
                                 menu_open = False
-                                self.menu_open = False
                                 load_game(pressed)
                             elif pressed == "Battle" or pressed == "Begin Battle":
                                 enemy_minor_fiend = Entity("Minor Fiend")#, 2)
@@ -627,6 +631,13 @@ class Crimson(object):
                                 self.in_battle = True
                                 menu_open = False
                                 self.player_turn()
+                            elif pressed == "Add Item":
+                                item_name = raw_input("What would you like to add? ")
+                                item_num =  raw_input("How many? ")
+                                self.add_item(Item(item_name, int(item_num)))
+                                print
+                                for x in self.items:
+                                    print x.name + ": " + str(x.num)
                     elif mouse_button == RMB:
                         pressed = "Right Click"
                         menu_open = False
@@ -836,6 +847,43 @@ class Crimson(object):
                 if event.key == pygame.K_ESCAPE:
                     self.menu_open = True
 
+    def save(self):
+        items = self.items
+        for x in xrange(len(items)):
+            if items[x] is not None:
+                items[x] = [items[x].name, items[x].num]
+        save_data = [self.allies, self.party, items]#, settings]
+        save_file = open(save_dir + str(self.player_team) + ".csav", "w")
+        pickle.dump(save_data, save_file)
+        save_file.close()
+
+    def add_item(self, item):
+        if type(item) is list:
+            for x in item:
+                if type(x) is list:
+                    self.add_item(Item(x[0], x[1]))
+                elif type(x) is Item:
+                    self.add_item(x)
+                else: # if type(x) is str:
+                    self.add_item(Item(x))
+        elif type(item) is str:
+            self.add_item(Item(x))
+        else:
+            items = self.items
+            for x in xrange(len(items)):
+                if items[x].name == item.name:
+                    items[x].num += item.num
+                    return True
+            self.items.append(item)
+        return True
+
+    def update_profile_list(self):
+        global saved_games
+        saved_games = {}
+        for file_name in os.listdir(save_dir):
+            if file_name.endswith(".csav"):
+                saved_games[file_name.strip("csav").strip(".")] = save_dir + file_name
+
 class Entity(object):
     def __init__(self, name, lvl=1, team="none"):
         object.__init__(self)
@@ -849,6 +897,7 @@ class Entity(object):
         entities = json.load(json_entities)
 
         if name not in entities:
+            #print str(name), "is not a valid entity name!"
             name = "default"
 
         if not self.original_name in entity_images:
@@ -945,8 +994,6 @@ class Entity(object):
         return entity_images[self.original_name][status][img_frame(frame, settings.entity_animation_wait, len(entity_images[self.original_name][status]))]
 
     def take_damage(self, amount):
-        rand_factor = [-0.2, -0.1, 0.0, 0.1, 0.2][random.randint(0, 4)] # Move this to attack function.
-        amount += amount * rand_factor
         amount = int(round(amount))
         if amount > 0:
             print self.name, "took", amount, "damage!"
@@ -1052,6 +1099,7 @@ class Attack(object):
         attacks = json.load(json_attacks)
 
         if name not in attacks:
+            print str(name), "is not a valid attack name!"
             name = "default"
 
         self.damage =             attacks[name]["damage"]
@@ -1083,6 +1131,8 @@ class Attack(object):
                         dmg = (self.damage + user.strength) / 3.0
                         # Modify dmg based on attack, user, and target elm.
                         # Remove dmg for target def.
+                    rand_factor = [0.8, 0.9, 1.0, 1.1, 1.2][random.randint(0, 4)]
+                    dmg *= rand_factor
                     target.take_damage(dmg)
                 else:
                     print "The attack missed!"
@@ -1130,6 +1180,7 @@ class Skill(object):
         skills = json.load(json_skills)
 
         if name not in skills:
+            print str(name), "is not a valid skill name!"
             name = "default"
 
         self.energy_cost =        skills[name]["energy_cost"]      # Skills cannot increase self.energy, only items can.
@@ -1145,6 +1196,9 @@ class Skill(object):
                 print msg + "!"
                 for x in self.effect:
                     if   x[0] == "health_mod":
+                        amount = x[1] * -1
+                        rand_factor = [0.8, 0.9, 1.0, 1.1, 1.2][random.randint(0, 4)] # Move this to attack function.
+                        amount *= rand_factor
                         target.take_damage(x[1] * -1)
                     elif x[0] == "energy_mod":
                         target.use_energy(x[1] * -1)
@@ -1196,6 +1250,7 @@ class Item(object):
         items = json.load(json_items)
 
         if name not in items:
+            print str(name), "is not a valid item name!"
             name = "default"
 
         self.target =             items[name]["target"]
@@ -1254,7 +1309,7 @@ class Item(object):
         return False
 
 ### ADD THESE TO ENTITY ###
-def draw_health(entity, health_rect, draw_text=True, rect_outline=2, color=(255,0,0)):
+def draw_health(entity, health_rect, draw_text=True, rect_outline=2, color=HPRED):
     health_per = float(entity.health) / entity.max_health
     if health_per > 1:
         health_per = 1
@@ -1267,7 +1322,7 @@ def draw_health(entity, health_rect, draw_text=True, rect_outline=2, color=(255,
         health_text_rect.center = health_rect.center
         screen.blit(health_text, health_text_rect)
 
-def draw_energy(entity, energy_rect, draw_text=True, rect_outline=2, color=(0,125,255)):
+def draw_energy(entity, energy_rect, draw_text=True, rect_outline=2, color=MPBLU):
     energy_per = float(entity.energy) / entity.max_energy
     if energy_per > 1:
         energy_per = 1
@@ -1280,7 +1335,7 @@ def draw_energy(entity, energy_rect, draw_text=True, rect_outline=2, color=(0,12
         energy_text_rect.center = energy_rect.center
         screen.blit(energy_text, energy_text_rect)
 
-def draw_xp(entity, xp_rect, draw_text=True, rect_outline=2, color=(0,175,0)):
+def draw_xp(entity, xp_rect, draw_text=True, rect_outline=2, color=XPGRN):
     xp_per = float(entity.lvl_xp[0]) / entity.lvl_xp[1]
     if xp_per > 1:
         xp_per = 1
@@ -1300,7 +1355,8 @@ def start_game(data=None):
         game = Crimson(data[0][0])
         game.allies = data[0]
         game.party = data[1]
-        game.items = data[2]
+        game.items = []
+        game.add_item(data[2])
         game.menu_open = False
         for ally in game.allies:
             x = Entity(ally.original_name) # Ensures all necessary images are loaded.

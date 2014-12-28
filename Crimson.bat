@@ -15,3 +15,4 @@ if %errorlevel% neq 0 (
     cls
     python "%current_dir%Crimson.py"
 )
+cd %current_dir%

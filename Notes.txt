@@ -20,16 +20,13 @@ TO DO:
  - Add automatic turn-change when all allies have moved.
  - Add Crimson.effect(self, effect, user, target)
  - Make bars change slowly.
-   - Utilize Crimson.animating boolean.
    - Make the while running loop activate a function in Crimson for each frame.
- - Saving/Loading
- - Count frames, display 1.png, 2.png, etc. Maybe based on (frame / amount_of_frames_to_wait % image_count) + 1?
+ - Test "Int" and "Elm" Attack types.
+ - Test "all_enemies" and "all_allies" targets.
 
 CURRENT BUGS:
  - Stats with modifiers don't fit correctly at high levels (left_panel)
- - Revival Tokens can be used on living allies. (add "target":"fainted")
  - Game closes on player defeat.
- - Menu stays open on load.
 
 LONG-TERM TO DO:
  - Add something resembling a story.
@@ -39,6 +36,7 @@ LONG-TERM TO DO:
 NOTES:
  - Replace '[^\S\r]*[^\S\r](?=\r)' with nothing to remove whitespace before newlines.
  - Save on name change.
+ - Dark <--> Light
  
 https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi
 http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi
