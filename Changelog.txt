@@ -34,8 +34,4 @@ v0.0.4
  * Improved saving/loading of items
  * Fixed bug when using Escape to open menu
  * Window now says correct version number
-<<<<<<< HEAD
  + Added animation for Hornet
-=======
- + Added animation for Hornet
->>>>>>> 6c940cb229f427e3823a2c4e910cf166ddc6fabd
