@@ -20,7 +20,8 @@ TO DO:
  - Make bars change slowly.
    - Make the while running loop activate a function in Crimson for each frame.
  - Test "Int" and "Elm" Attack types.
- - Test "all_enemies" and "all_allies" targets.
+ - Test "all_enemies" and "all_allies" targets.
+ - Add name changing.
 CURRENT BUGS:
  - Stats with modifiers don't fit correctly at high levels (left_panel)
  - Game closes on player defeat.
@@ -30,25 +31,34 @@ LONG-TERM TO DO:
  - Upload save information to MySQL, to be displayed on Crimson Domain.
 NOTES:
  - Replace '[^\S\r]*[^\S\r](?=\r)' with nothing to remove whitespace before newlines.
- - Save on name change.
- - Elements, Alignments, and Traits.
+ - Always save after name change.
+ - Types, Elements, Alignments, and Traits.
+ - Types:
+   - Physical  (STR)
+   - Magical   (INT)
+   - Elemental (ELM)
  - Elements: Increase attack power with similarly typed attacks.
    - Light
    - Dark
    - Electric
    - Fire
    - Water
+   - Earth
  - Alignments:
    - Good: Adds weakness to Dark, resistance to Light.
    - Neutral
    - Evil: Adds weakness to Light, resistance to Dark.
  - Traits:
-   - Undead: Low Agi, Dex. High Str.
-   - Machine: Weak to Water. High Def. Low Dex.
-   - Demon: Weak to Light. Slightly increased stats.
-   - Flying: High Agi, Dex. Low Str. Weak to Electric.
+   - Undead: Low Agi, Dex, Int. High Str. Weak to Elemental.
+   - Machine: Weak to Water. High Def. Low Dex. Resists Electric.
+   - Demon: Weak to Light. Slightly increased stats. Resists Dark.
+   - Flying: High Agi, Dex. Low Str. Weak to Electric. Restists Earth.
    - Brute: High Str. Low Int, Dex.
    - Tactician: High Int. Low Str.
-   - Chained: Greatly decreased stats.
+   - Chained: Greatly decreased stats.
+   - Mage: High Int. Low Str, Def. Strong Magical offense/defense.
+   - Giant: High Str, Def. Low Int. Very low Agi, Dex.
+   - Warrior: Strong Physical offense/defense.
+   - Rogue: High Agi, Dex. Strong Elemental offense.
 https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi
 http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi
