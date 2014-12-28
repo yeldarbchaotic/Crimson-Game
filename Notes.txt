@@ -4,14 +4,12 @@ bs_button_state:
  2 - Attacks
  3 - Skills
  4 - Items
- 5 - Run Away
-
+ 5 - Run Away
 Effects: (Will be applied to "target")
  - ["health_mod",amount] (positive numbers to increase)
  - ["energy_mod",amount] (negative numbers to decrease)
  - ["stat_mod",stat_type,amount]
- - ["escape",percent_chance]
-
+ - ["escape",percent_chance]
 TO DO:
  - Add fainting. Maybe image becomes mostly transparent?
  - Come up with a different word for fainting.
@@ -22,21 +20,35 @@ TO DO:
  - Make bars change slowly.
    - Make the while running loop activate a function in Crimson for each frame.
  - Test "Int" and "Elm" Attack types.
- - Test "all_enemies" and "all_allies" targets.
-
+ - Test "all_enemies" and "all_allies" targets.
 CURRENT BUGS:
  - Stats with modifiers don't fit correctly at high levels (left_panel)
- - Game closes on player defeat.
-
+ - Game closes on player defeat.
 LONG-TERM TO DO:
  - Add something resembling a story.
  - Browse for picture to associate with current name. (Auto rename and put in images folder.)
- - Upload save information to MySQL, to be displayed on Crimson Domain.
-
+ - Upload save information to MySQL, to be displayed on Crimson Domain.
 NOTES:
  - Replace '[^\S\r]*[^\S\r](?=\r)' with nothing to remove whitespace before newlines.
  - Save on name change.
- - Dark <--> Light
- 
+ - Elements, Alignments, and Traits.
+ - Elements: Increase attack power with similarly typed attacks.
+   - Light
+   - Dark
+   - Electric
+   - Fire
+   - Water
+ - Alignments:
+   - Good: Adds weakness to Dark, resistance to Light.
+   - Neutral
+   - Evil: Adds weakness to Light, resistance to Dark.
+ - Traits:
+   - Undead: Low Agi, Dex. High Str.
+   - Machine: Weak to Water. High Def. Low Dex.
+   - Demon: Weak to Light. Slightly increased stats.
+   - Flying: High Agi, Dex. Low Str. Weak to Electric.
+   - Brute: High Str. Low Int, Dex.
+   - Tactician: High Int. Low Str.
+   - Chained: Greatly decreased stats.
 https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi
 http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi
