@@ -6,8 +6,10 @@ import json
 import os
 import copy
 import pickle
+import pygame._view
+import sys
 
-crimson_version = "v0.0.4"
+crimson_version = "v0.0.5"
 
 # Define Constants
 BLACK = (  0,  0,  0)
@@ -39,7 +41,7 @@ class Settings(object):
         self.popup_offset_px = [8, 16]
         self.menu_options = ["Continue", "Save", "Load", "Options", "Quit"]
         self.battle_menu_options = ["End Turn", "Options", "Return to Game", "Quit"] # "Quicksave", "Quickload", "Auto-Battle"?
-        self.menu_options += ["Battle", "Add Item"] #### DEBUG ####
+        self.menu_options += ["Battle"]#, "Add Item"] #### DEBUG ####
         self.entity_img_types = ["full_health", "half_health", "low_health", "fainted", "sleeping"]
         self.entity_animation_wait = 15
 
@@ -49,7 +51,7 @@ class Settings(object):
             self.player_name = new_name
 
 settings = Settings()
-settings.change_player_name(raw_input("Enter your name: "))
+#settings.change_player_name(raw_input("Enter your name: "))
 
 print "Loading...",
 
@@ -60,8 +62,9 @@ pygame.display.set_caption("Crimson - The Game " + crimson_version)
 #pygame.display.toggle_fullscreen()
 
 # Loads the images and prepares the screen.
-game_dir = os.path.dirname(os.path.realpath(__file__)) + "\\"
-img_dir = game_dir + "images\\"
+game_dir = os.path.realpath(".") + "\\"
+data_dir = game_dir + "data\\"
+img_dir =  game_dir + "images\\"
 save_dir = game_dir + "save\\"
 logo =       pygame.image.load(img_dir + "Logo.png")
 background = pygame.transform.smoothscale(pygame.image.load(img_dir + "Background.png"), settings.win_size)
@@ -125,7 +128,7 @@ class Crimson(object):
         self.running = True
         self.in_battle = False
         self.has_acted = [] # Tracks all allies who have already done something during the current turn.
-        self.animating = False ########## USE THIS!!!
+        self.animating = False ########## USE THIS!!! #### Or maybe not....?
         self.menu_open = False
         self.bs_center_x, self.bs_center_y = 100, 100
         self.turn = [0, "Player"]
@@ -139,6 +142,11 @@ class Crimson(object):
         self.bs_button_text_rect = []
         self.lp_selected_ally = self.allies[self.party[0]]
         self.frame = 0
+        self.on_title = False #True
+        self.title_button = []
+        self.title_button_text = []
+        self.title_button_text_rect = []
+        self.title_button_state = 0
 
         self.bs_id_box, self.bs_id_health_rect, self.bs_id_energy_rect, self.bs_id_xp_rect, self.bs_id_name_rect, self.bs_id_name = [], [], [], [], [], []
         for x in xrange(6): # Gets coordinates for all parts of the battle screen IDs.
@@ -189,7 +197,7 @@ class Crimson(object):
         self.running = False
         self.in_battle = False
         pygame.quit()
-        exit()
+        sys.exit()
 
     def escape(self, chance, user=None):
         rand_chance = random.randint(1, 100)
@@ -480,6 +488,9 @@ class Crimson(object):
         if self.menu_open:
             check_str = ["menu_popup_button"]
             check = [self.menu_button_rect]
+        elif self.on_title:
+            check_str = ["title_button"]
+            check = [self.title_button]
         else:
             check_str = ["bs_button", "bs_id_box",    "lp_pmember_button"]
             check =     [ self.bs_button,   self.bs_id_box, self.lp_pmember_button ]
@@ -884,6 +895,36 @@ class Crimson(object):
             if file_name.endswith(".csav"):
                 saved_games[file_name.strip("csav").strip(".")] = save_dir + file_name
 
+    def draw_title_screen(self):
+        screen.blit(background, (0, 0))
+        title = font.render("This will be the title screen.", True, BLACK)
+        title_rect = title.get_rect(topleft=wp(settings.left_panel_x + 2, settings.top_panel_y + 4))
+        screen.blit(title, title_rect)
+
+    def title_screen(self):
+        self.draw_title_screen()
+        pygame.display.flip()
+        
+        self.title_button, self.title_button_text, self.title_button_text_rect, self.title_button_state = [], [], [], 0
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = event.pos
+                mouse_button = event.button # Left(1), middle(2), or right(3) mouse button, scrollup(4) or scrolldown(5).
+                if mouse_button == 1:
+                    pressed = self.get_button(mouse_pos)
+                    if pressed is not None:
+                        if pressed[0] == "lp_pmember_button":
+                            self.lp_selected_ally = self.allies[self.party[pressed[1]]]
+                elif mouse_button == 3:
+                    self.menu_open = True
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    self.on_title = False
+                    self.menu_open = False
+
 class Entity(object):
     def __init__(self, name, lvl=1, team="none"):
         object.__init__(self)
@@ -893,7 +934,7 @@ class Entity(object):
         self.is_fainted = False
         self.team = team
 
-        json_entities = open(game_dir + "entities.json")
+        json_entities = open(data_dir + "entities.json")
         entities = json.load(json_entities)
 
         if name not in entities:
@@ -1095,7 +1136,7 @@ class Attack(object):
         self.name = name
         self.lvl = int(lvl)
 
-        json_attacks = open(game_dir + "attacks.json")
+        json_attacks = open(data_dir + "attacks.json")
         attacks = json.load(json_attacks)
 
         if name not in attacks:
@@ -1176,7 +1217,7 @@ class Skill(object):
         self.name = name
         self.lvl = int(lvl)
 
-        json_skills = open(game_dir + "skills.json")
+        json_skills = open(data_dir + "skills.json")
         skills = json.load(json_skills)
 
         if name not in skills:
@@ -1246,7 +1287,7 @@ class Item(object):
         self.name = name
         self.num =  num
 
-        json_items = open(game_dir + "items.json")
+        json_items = open(data_dir + "items.json")
         items = json.load(json_items)
 
         if name not in items:
@@ -1375,7 +1416,9 @@ start_game()
 print "Done"
 while game.running:
     game.frame += 1
-    if game.in_battle:
+    if game.on_title:
+        game.title_screen()
+    elif game.in_battle:
         game.battle()
     else:
         game.story_time()

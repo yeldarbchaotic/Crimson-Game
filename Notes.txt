@@ -45,20 +45,18 @@ NOTES:
    - Water
    - Earth
  - Alignments:
-   - Good: Adds weakness to Dark, resistance to Light.
-   - Neutral
-   - Evil: Adds weakness to Light, resistance to Dark.
+   - Good: Adds weakness to Dark, resistance to Light. Allows use of Holy.
+   - Neutral: Resists taunts by extremists.
+   - Evil: Adds weakness to Light, resistance to Dark. Allows use of Devil.
  - Traits:
-   - Undead: Low Agi, Dex, Int. High Str. Weak to Elemental.
-   - Machine: Weak to Water. High Def. Low Dex. Resists Electric.
-   - Demon: Weak to Light. Slightly increased stats. Resists Dark.
-   - Flying: High Agi, Dex. Low Str. Weak to Electric. Restists Earth.
-   - Brute: High Str. Low Int, Dex.
-   - Tactician: High Int. Low Str.
+   - Undead: Weak to Fire, Light.
+   - Machine: Weak to Water. Resists Electric.
+   - Demon: Weak to Light. Resists Dark.
+   - Flying: Weak to Electric. Resists Earth.
+   - Brute: Strong Physical.
    - Chained: Greatly decreased stats.
-   - Mage: High Int. Low Str, Def. Strong Magical offense/defense.
-   - Giant: High Str, Def. Low Int. Very low Agi, Dex.
-   - Warrior: Strong Physical offense/defense.
-   - Rogue: High Agi, Dex. Strong Elemental offense.
+   - Mage: Strong Magical.
+   - Warrior: Strong Physical.
+   - Rogue: Strong Elemental.
 https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi
 http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi

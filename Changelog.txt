@@ -1,6 +1,7 @@
 v0.0.1
  + Added Hornet
  + Added Minor Fiend
+ + Added animation support
  + Added animation for Minor Fiend
  + Added default image
  + Added attacks
@@ -23,15 +24,25 @@ v0.0.2
 v0.0.3
  * Improved targetting
  * Improved damage equation
- * Fixed bug with revival tokens being usable on living allies
+ - Fixed bug with revival tokens being usable on living allies
  - Removed installer for now
 v0.0.3a
- * Fixed visual bug on revive
+ - Fixed visual bug on revive
 v0.0.4
  * Items now do fixed damage
- * Fixed bug with menu opening after load
+ - Fixed bug with menu opening after load
  + Added ability to gain new items
  * Improved saving/loading of items
- * Fixed bug when using Escape to open menu
+ - Fixed bug when using Escape to open menu
  * Window now says correct version number
  + Added animation for Hornet
+v0.0.5
+ + Added .exe file
+ - No longer dependant on Python?
+ - Removed .bat file
+ + Small steps toward title screen
+ - Removed debug for adding items
+ - Temporarily removed ability to change player name
+ * Reorganized file structure
+ * Fixed error on close
+ - Removed console window
