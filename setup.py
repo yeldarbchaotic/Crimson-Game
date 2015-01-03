@@ -27,7 +27,7 @@ class Target:
         # for the versioninfo resources
         self.version = "0.0.5"
         self.company_name = "Crimson Industries"
-        self.copyright = "no copyright"
+        self.copyright = ""
         self.name = "Crimson"
 
 ################################################################
@@ -86,7 +86,7 @@ crimson = Target(
     # what to build
     script = "Crimson.py",
     other_resources = [(RT_MANIFEST, 1, manifest_template % dict(prog="Crimson"))],
-##    icon_resources = [(1, "icon.ico")],
+    icon_resources = [(1, "images/Crimson.ico")],
     dest_base = "Crimson")
 
 ################################################################

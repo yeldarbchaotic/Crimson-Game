@@ -46,3 +46,5 @@ v0.0.5
  * Reorganized file structure
  * Fixed error on close
  - Removed console window
+v0.0.5a
+ + Added icon

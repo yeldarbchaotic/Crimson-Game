@@ -32,6 +32,7 @@ LONG-TERM TO DO:
 NOTES:
  - Replace '[^\S\r]*[^\S\r](?=\r)' with nothing to remove whitespace before newlines.
  - Always save after name change.
+ - Do not use input, raw_input. Causes problems when compiled.
  - Types, Elements, Alignments, and Traits.
  - Types:
    - Physical  (STR)
