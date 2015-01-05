@@ -9,7 +9,7 @@ import pickle
 import pygame._view
 import sys
 
-crimson_version = "v0.0.5"
+crimson_version = "v0.0.6"
 
 # Define Constants
 BLACK = (  0,  0,  0)
