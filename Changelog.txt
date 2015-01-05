@@ -49,9 +49,12 @@ v0.0.5
 v0.0.5a
  + Added icon
 v0.0.6
- + Added method for converting hex values to usable colors (just in case)
+ + Added method for converting hex values (eg.#FFFFFF) to usable colors (just in case)
  * Improved performance while in battle
  * Game no longer closes when the player loses
  * Battle can no longer start when player's team is unable to battle
  * Fixed top-left image always being blurry
  * Reduced memory usage slightly
+v0.0.6a
+ * Improved targeting system
+ * Improved performance while in battle

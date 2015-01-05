@@ -41,7 +41,7 @@ class Settings(object):
         self.popup_offset_px = [8, 16]
         self.menu_options = ["Continue", "Save", "Load", "Options", "Quit"]
         self.battle_menu_options = ["End Turn", "Options", "Return to Game", "Quit"] # "Quicksave", "Quickload", "Auto-Battle"?
-        self.menu_options += ["Battle"]#, "Add Item"] #### DEBUG ####
+        self.menu_options += ["Battle"]##, "Add Item"] #### DEBUG ####
         self.entity_img_types = ["full_health", "half_health", "low_health", "fainted", "sleeping"]
         self.entity_animation_wait = 15
 
@@ -51,15 +51,15 @@ class Settings(object):
             self.player_name = new_name
 
 settings = Settings()
-#settings.change_player_name(raw_input("Enter your name: "))
+##settings.change_player_name(raw_input("Enter your name: "))
 
 print "Loading...",
 
 # Creates the pygame window.
 pygame.init()
-screen = pygame.display.set_mode(settings.win_size)#, FULLSCREEN)
+screen = pygame.display.set_mode(settings.win_size)##, FULLSCREEN)
 pygame.display.set_caption("Crimson - The Game " + crimson_version)
-#pygame.display.toggle_fullscreen()
+##pygame.display.toggle_fullscreen()
 
 # Loads the images and prepares the screen.
 game_dir = os.path.realpath(".") + "\\"
@@ -172,7 +172,7 @@ class Crimson(object):
         self.bs_button_text_rect = []
         self.lp_selected_ally = self.allies[self.party[0]]
         self.frame = 0
-        self.on_title = False #True
+        self.on_title = False##True
         self.title_button = []
         self.title_button_text = []
         self.title_button_text_rect = []
@@ -259,6 +259,7 @@ class Crimson(object):
                         attacks.append(x)
                 target = targets[random.randint(0, len(targets) - 1)]
                 attack = attacks[random.randint(0, len(attacks) - 1)]
+                # Add check to make sure attack can target enemy!
                 attack.use(enemy, target)
         if self.can_player_battle() and self.can_enemy_battle():
             self.player_turn()
@@ -659,9 +660,9 @@ class Crimson(object):
                                 load_game(pressed)
                             elif pressed == "Battle" or pressed == "Begin Battle":
                                 if self.can_player_battle():
-                                    game.add_enemy(Entity("Minor Fiend"))#, 2))
-                                    game.add_enemy(Entity("Hornet"))#, 25))
-                                    #game.add_enemy(Entity("Hornet"))#, 2))
+                                    game.add_enemy(Entity("Minor Fiend"))##, 2))
+                                    game.add_enemy(Entity("Hornet"))##, 25))
+                                    #game.add_enemy(Entity("Hornet"))##, 2))
                                     self.in_battle = True
                                     self.player_turn()
                                 else:
@@ -712,9 +713,7 @@ class Crimson(object):
                                     clicked_ally = self.party[[1,0,2][pressed[1] - 3]]
                                     if clicked_ally is not None:
                                         if self.bs_selected_button is not None:
-                                            if self.bs_selected_action.can_target(self.bs_selected_ally, self.allies[clicked_ally]):
-                                                self.bs_selected_action.use(self.bs_selected_ally, self.allies[clicked_ally])
-                                                self.update_bs_buttons()
+                                            self.bs_selected_action.use(self.bs_selected_ally, self.allies[clicked_ally])
                                         else:
                                             if self.allies[clicked_ally] not in self.has_acted:
                                                 if self.allies[clicked_ally].can_battle():
@@ -725,32 +724,24 @@ class Crimson(object):
                                     if self.enemies[pressed[1]] is not None:
                                         # If an attack/skill/item has been selected.
                                         if self.bs_selected_button is not None:
-                                            if self.bs_selected_action.can_target(self.bs_selected_ally, self.enemies[pressed[1]]):
-                                                self.bs_selected_action.use(self.bs_selected_ally, self.enemies[pressed[1]])
-                                                self.update_bs_buttons()
+                                            self.bs_selected_action.use(self.bs_selected_ally, self.enemies[pressed[1]])
                             elif pressed[0] == "bs_button":
                                 # Choose Attacks, Skills, Items, or Standby.
                                 if self.bs_button_state == 1:
                                     # Go to attack menu.
                                     if pressed[1] == 0:
-                                        self.bs_button_state = 2
-                                        self.bs_button_text =  self.get_button_text(2)
+                                        self.update_bs_buttons(2)
                                     # Go to skills menu.
                                     elif pressed[1] == 1:
-                                        self.bs_button_state = 3
-                                        self.bs_button_text =  self.get_button_text(3)
+                                        self.update_bs_buttons(3)
                                     # Go to item menu.
                                     elif pressed[1] == 2:
-                                        self.bs_button_state = 4
-                                        self.bs_button_text  = self.get_button_text(4)
-                                        self.bs_item_page = 0
+                                        self.update_bs_buttons(4)
                                     # Standby
                                     else:
                                         print "Standby"
-                                        self.bs_button_state = 0
-                                        self.bs_selected_ally = None
-                                        self.bs_button_text = self.get_button_text(0)
                                         self.has_acted.append(self.bs_selected_ally)
+                                        self.update_bs_buttons()
                                 # Choose between available Attacks.
                                 elif self.bs_button_state == 2:
                                     if self.bs_selected_ally.attack_list[pressed[1]] is not None:
@@ -758,9 +749,7 @@ class Crimson(object):
                                         if self.bs_selected_action.target != []:
                                             self.bs_selected_button = pressed[1]
                                         else:
-                                            if self.bs_selected_action.can_target(self.bs_selected_ally, None):
-                                                self.bs_selected_action.use(self.bs_selected_ally)
-                                                self.update_bs_buttons()
+                                            self.bs_selected_action.use(self.bs_selected_ally)
                                 # Choose between available Skills.
                                 elif self.bs_button_state == 3:
                                     if self.bs_selected_ally.skill_list[pressed[1]] is not None:
@@ -769,20 +758,16 @@ class Crimson(object):
                                         if self.bs_selected_action.target != []:
                                             self.bs_selected_button = pressed[1]
                                         else:
-                                            if self.bs_selected_action.can_target(self.bs_selected_ally, None):
-                                                self.bs_selected_action.use(self.bs_selected_ally)
-                                                self.update_bs_buttons()
+                                            self.bs_selected_action.use(self.bs_selected_ally)
                                 # Choose between available Items.
                                 elif self.bs_button_state == 4:
                                     # Next/First page.
-                                    self.bs_selected_button = None
-                                    self.bs_selected_action = None
                                     if pressed[1] == 3:
                                         if self.bs_item_page * 3 + 4 > len(self.items):
                                             self.bs_item_page = 0
                                         else:
                                             self.bs_item_page += 1
-                                        self.bs_button_text = self.get_button_text(4, self.bs_item_page)
+                                        self.update_bs_buttons(4, self.bs_item_page)
                                     else:
                                         self.bs_selected_action = [1,0,2][pressed[1]] + 3 * self.bs_item_page
                                         if self.bs_selected_action < len(self.items):
@@ -790,9 +775,7 @@ class Crimson(object):
                                             if self.bs_selected_action.target != []:
                                                 self.bs_selected_button = pressed[1]
                                             else:
-                                                if self.bs_selected_action.can_target(self.bs_selected_ally, None):
-                                                    self.bs_selected_action.use(self.bs_selected_ally)
-                                                    self.update_bs_buttons()
+                                                self.bs_selected_action.use(self.bs_selected_ally)
                         else:
                             self.update_bs_buttons()
                     # On right click.
@@ -801,21 +784,19 @@ class Crimson(object):
                         if self.bs_button_state == 0:
                             # Open Menu.
                             self.menu_open = True
-                            #self.enemy_turn()
+                            ##self.enemy_turn()
                         # Just ally selected.
                         if self.bs_button_state == 1:
-                            self.bs_selected_ally = None
-                            self.bs_button_text = self.get_button_text(0)
-                            self.bs_button_state = 0
+                            self.update_bs_buttons()
                         # Attacks, Skills, or Items.
-                        elif self.bs_button_state == 2 or self.bs_button_state == 3 or self.bs_button_state == 4:
+                        elif self.bs_button_state >= 2 and self.bs_button_state <= 4:
                             # Action already selected.
                             if self.bs_selected_button is not None:
                                 self.update_bs_buttons(self.bs_button_state)
                             # Action not yet selected.
                             elif self.bs_item_page > 0:
                                 self.bs_item_page -= 1
-                                self.bs_button_text = self.get_button_text(4, self.bs_item_page)
+                                self.update_bs_buttons(4, self.bs_item_page)
                             else:
                                 self.update_bs_buttons(1)
                 elif event.type == pygame.KEYDOWN:
@@ -859,7 +840,7 @@ class Crimson(object):
         for x in xrange(len(items)):
             if items[x] is not None:
                 items[x] = [items[x].name, items[x].num]
-        save_data = [self.allies, self.party, items]#, settings]
+        save_data = [self.allies, self.party, items]##, settings]
         save_file = open(save_dir + str(self.player_team) + ".csav", "w")
         pickle.dump(save_data, save_file)
         save_file.close()
@@ -915,19 +896,21 @@ class Crimson(object):
                         if pressed[0] == "lp_pmember_button":
                             self.lp_selected_ally = self.allies[self.party[pressed[1]]]
                 elif mouse_button == 3:
-                    self.menu_open = True
+                    self.on_title = False
+                    self.menu_open = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.on_title = False
                     self.menu_open = False
 
-    def update_bs_buttons(self, state=0):
+    def update_bs_buttons(self, state=0, item_page=0):
         if state == 0:
             self.bs_selected_ally = None
         self.bs_selected_button =   None
         self.bs_selected_action =   None
         self.bs_button_state = state
-        self.bs_button_text = self.get_button_text(state)
+        self.bs_item_page = item_page
+        self.bs_button_text = self.get_button_text(state, item_page)
 
 class Entity(object):
     def __init__(self, name, lvl=1, team="none"):
@@ -942,7 +925,7 @@ class Entity(object):
         entities = json.load(json_entities)
 
         if name not in entities:
-            #print str(name), "is not a valid entity name!"
+            ##print str(name), "is not a valid entity name!"
             name = "default"
 
         if not self.original_name in entity_images:
@@ -1156,41 +1139,45 @@ class Attack(object):
 
         self.damage =             attacks[name]["damage"]
         self.accuracy =           attacks[name]["accuracy"]        # For a 25% chance, enter 25. Definite hit is -1.
-        self.type =               attacks[name]["type"]            # "Str", "Int"
+        self.type =               attacks[name]["type"]            # "Str", "Int", "Elm"
         self.element =            attacks[name]["element"]         # "N/A", "Psn", "Drk"
         self.energy_cost =        attacks[name]["energy_cost"]
         self.target =             attacks[name]["target"]          # Always "enemy" or "all_enemies"?
 
     def use(self, user, target=None):
         if user.can_battle():
-            if user.use_energy(self.energy_cost):
-                msg = user.name + " used " + self.name
-                if target is not None and user is not target:
-                    msg += " on " + target.name
-                print msg + "!"
-                if self.accuracy == -1:
-                    hit = True
+            if self.can_target(user, target):
+                if user.use_energy(self.energy_cost):
+                    msg = user.name + " used " + self.name
+                    if target is not None and user is not target:
+                        msg += " on " + target.name
+                    print msg + "!"
+                    if self.accuracy == -1:
+                        hit = True
+                    else:
+                        hit = random.randint(1, 100) < self.accuracy
+                    if hit:
+                        if self.type == "Str":
+                            dmg = (self.damage + user.strength) / 3.0
+                            # Remove dmg for target def.
+                        elif self.type == "Int":
+                            dmg = (self.damage + user.intelligence) / 3.0
+                            # Remove dmg for target int.
+                        elif self.type == "Elm":
+                            dmg = (self.damage + user.strength) / 3.0
+                            # Modify dmg based on attack, user, and target elm.
+                            # Remove dmg for target def.
+                        rand_factor = [0.8, 0.9, 1.0, 1.1, 1.2][random.randint(0, 4)]
+                        dmg *= rand_factor
+                        target.take_damage(dmg)
+                    else:
+                        print "The attack missed!"
+                    game.has_acted.append(user)
+                    game.update_bs_buttons()
                 else:
-                    hit = random.randint(1, 100) < self.accuracy
-                if hit:
-                    if self.type == "Str":
-                        dmg = (self.damage + user.strength) / 3.0
-                        # Remove dmg for target def.
-                    elif self.type == "Int":
-                        dmg = (self.damage + user.intelligence) / 3.0
-                        # Remove dmg for target int.
-                    elif self.type == "Elm":
-                        dmg = (self.damage + user.strength) / 3.0
-                        # Modify dmg based on attack, user, and target elm.
-                        # Remove dmg for target def.
-                    rand_factor = [0.8, 0.9, 1.0, 1.1, 1.2][random.randint(0, 4)]
-                    dmg *= rand_factor
-                    target.take_damage(dmg)
-                else:
-                    print "The attack missed!"
-                game.has_acted.append(user)
+                    print user.name, "doesn't have enough energy!"
             else:
-                print user.name, "doesn't have enough energy!"
+                print "Unable to target", str(target.name), "with", self.name + "!"
         else:
             print user.name, "is unable to battle!"
 
@@ -1241,26 +1228,30 @@ class Skill(object):
 
     def use(self, user, target=None):
         if user.can_battle():
-            if user.use_energy(self.energy_cost):
-                msg = user.name + " used " + self.name
-                if target is not None and user is not target:
-                    msg += " on " + target.name
-                print msg + "!"
-                for x in self.effect:
-                    if   x[0] == "health_mod":
-                        amount = x[1] * -1
-                        rand_factor = [0.8, 0.9, 1.0, 1.1, 1.2][random.randint(0, 4)] # Move this to attack function.
-                        amount *= rand_factor
-                        target.take_damage(x[1] * -1)
-                    elif x[0] == "energy_mod":
-                        target.use_energy(x[1] * -1)
-                    elif x[0] == "stat_mod":
-                        target.buff(x[1], x[2])
-                    elif x[0] == "escape":
-                        game.escape(x[1], self)
-                game.has_acted.append(user)
+            if self.can_target(user, target):
+                if user.use_energy(self.energy_cost):
+                    msg = user.name + " used " + self.name
+                    if target is not None and user is not target:
+                        msg += " on " + target.name
+                    print msg + "!"
+                    for x in self.effect:
+                        if   x[0] == "health_mod":
+                            amount = x[1] * -1
+                            rand_factor = [0.8, 0.9, 1.0, 1.1, 1.2][random.randint(0, 4)] # Move this to attack function.
+                            amount *= rand_factor
+                            target.take_damage(x[1] * -1)
+                        elif x[0] == "energy_mod":
+                            target.use_energy(x[1] * -1)
+                        elif x[0] == "stat_mod":
+                            target.buff(x[1], x[2])
+                        elif x[0] == "escape":
+                            game.escape(x[1], self)
+                    game.has_acted.append(user)
+                    game.update_bs_buttons()
+                else:
+                    print user.name, "doesn't have enough energy!"
             else:
-                print user.name, "doesn't have enough energy!"
+                print "Unable to target", str(target.name), "with", self.name + "!"
         else:
             print user.name, "is unable to battle!"
 
@@ -1310,25 +1301,29 @@ class Item(object):
 
     def use(self, user, target=None):
         if user.can_battle():
-            msg = user.name + " used " + self.name
-            if target is not None and user is not target:
-                msg += " on " + target.name
-            print msg + "!"
-            for x in self.effect:
-                if   x[0] == "health_mod":
-                    target.take_damage(x[1] * -1)
-                elif x[0] == "energy_mod":
-                    target.use_energy(x[1] * -1)
-                elif x[0] == "stat_mod":
-                    target.buff(x[1], x[2])
-                elif x[0] == "escape":
-                    game.escape(x[1], self)
-            self.num -= 1
-            if self.num <= 0:
-                game.items.pop(game.items.index(self))
-                if len(game.items) < 2:
-                    game.items.append(None)
-            game.has_acted.append(user)
+            if self.can_target(user, target):
+                msg = user.name + " used " + self.name
+                if target is not None and user is not target:
+                    msg += " on " + target.name
+                print msg + "!"
+                for x in self.effect:
+                    if   x[0] == "health_mod":
+                        target.take_damage(x[1] * -1)
+                    elif x[0] == "energy_mod":
+                        target.use_energy(x[1] * -1)
+                    elif x[0] == "stat_mod":
+                        target.buff(x[1], x[2])
+                    elif x[0] == "escape":
+                        game.escape(x[1], self)
+                self.num -= 1
+                if self.num <= 0:
+                    game.items.pop(game.items.index(self))
+                    if len(game.items) < 2:
+                        game.items.append(None)
+                game.has_acted.append(user)
+                game.update_bs_buttons()
+            else:
+                print "Unable to target", str(target.name), "with", self.name + "!"
         else:
             print user.name, "is unable to battle!"
 
@@ -1415,11 +1410,11 @@ def start_game(data=None):
     else:
         player = Entity(settings.player_name)
         game = Crimson(player)
-        game.items = [Item("Health Potion"), Item("Energy Potion"), Item("Smoke Bomb"), Item("Small Stone", 3), Item("Energy Drain"), Item("Revival Token")] # game.add_item(self, item)
-        minor_fiend = Entity("Minor Fiend")#, 10)
+        game.add_item([Item("Health Potion"), Item("Energy Potion"), Item("Smoke Bomb"), Item("Small Stone", 3), Item("Energy Drain"), Item("Revival Token")])
+        minor_fiend = Entity("Minor Fiend")##, 10)
         game.add_ally(minor_fiend)
-        #hornet = Entity("Hornet")
-        #game.add_ally(hornet)
+        ##hornet = Entity("Hornet")
+        ##game.add_ally(hornet)
         game.running = True
 
 start_game()
