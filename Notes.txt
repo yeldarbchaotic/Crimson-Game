@@ -11,7 +11,7 @@ Effects: (Will be applied to "target")
  - ["stat_mod",stat_type,amount]
  - ["escape",percent_chance]
 TO DO:
- - Add fainting. Maybe image becomes mostly transparent?
+ - Add fainting. Maybe image becomes mostly transparent? (In fainted folder of images)
  - Come up with a different word for fainting.
  - Add Entity.receive_attack(self, attacker, attack)
    - Take damage, element, and attacker's strength into account.
@@ -28,7 +28,8 @@ CURRENT BUGS:
 LONG-TERM TO DO:
  - Add something resembling a story.
  - Browse for picture to associate with current name. (Auto rename and put in images folder.)
- - Upload save information to MySQL, to be displayed on Crimson Domain.
+ - Upload save information to MySQL, to be displayed on Crimson Domain.
+ - Abort execution and notify user if important file is not found.
 NOTES:
  - Replace '[^\S\r]*[^\S\r](?=\r)' with nothing to remove whitespace before newlines.
  - Always save after name change.

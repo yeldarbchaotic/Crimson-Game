@@ -30,7 +30,7 @@ class Settings(object):
         self.tr_logo_y = 50
         self.lp_bar_y = 7
         self.lp_pm_box_x = self.left_panel_x / 6.0
-        self.font_size_x = 1.85
+        self.font_size_x = 1.86
         self.bs_id_box_x = 12.5
         self.bs_id_box_y = 25
         self.bs_id_box_marg = [1, 1]
@@ -75,7 +75,7 @@ y_x = lambda img, y: int((y / float(img.get_height())) * img.get_width())
 
 # Stands for window percent.
 def wp(x=None, y=None):
-    """Returns the number of pixels, given a set of percentages."""
+    """Returns the number of pixels, given a percentage of the screen."""
     if x is not None and y is not None:
         newx = (x / 100.0) * settings.win_size[0]
         newy = (y / 100.0) * settings.win_size[1]
@@ -94,6 +94,36 @@ def wp(x=None, y=None):
 def load_game(profile_name):
     data = pickle.load(file(saved_games[profile_name]))
     start_game(data)
+
+def to_color(value, short=True): # Just in case, not actually used yet.
+    """Converts either String ("#FFFFFF") or Number (16777215) to Color ((255,255,255))"""
+    string = value
+    if type(string) is not str:
+        try:
+            string = hex(string)
+            short = False
+        except TypeError:
+            print "Error: Value must be String or Number!"
+            string = hex(0)
+    string = string.split("x")
+    string.reverse()
+    string = string[0]
+    if len(string) < 6:
+        if len(string) == 3 and short:
+            string = string[0] + string[0] + string[1] + string[1] + string[2] + string[2]
+        else:
+            while len(string) < 6:
+                string = "0" + string
+    hex_str = string.upper()
+    int_list = []
+    for x in xrange(3):
+        try:
+            int_list.append(int(hex_str[x*2:x*2+2], 16))
+        except ValueError:
+            print "Error: '" + hex_str[x*2:x*2+2] + "' is not a valid hexadecimal pair!"
+            return (0,0,0)
+    color = (int_list[0], int_list[1], int_list[2])
+    return color
 
 #############################################################################{
 ################################# SETTINGS! #################################
@@ -171,7 +201,7 @@ class Crimson(object):
             self.bs_button_text.append(None)
             self.bs_button_text_rect.append(None)
         self.bs_center_x = settings.left_panel_x + settings.bs_id_box_marg[0] * 2 + settings.bs_id_box_x * 1.5 # Percent!
-        self.bs_center_y = (self.bs_id_box[4].top + self.bs_id_box[1].bottom) / 2.0                                      # Pixels!
+        self.bs_center_y = (self.bs_id_box[4].top + self.bs_id_box[1].bottom) / 2.0                            # Pixels!
         self.bs_button[0].midbottom = (wp(x=self.bs_center_x), self.bs_center_y - wp(y=1))
         self.bs_button[3].midtop =    (wp(x=self.bs_center_x), self.bs_center_y + wp(y=1))
         self.bs_button[1].midright =  (wp(x=self.bs_center_x - settings.bs_button_x / 2.0 - 0.5), self.bs_center_y)
@@ -207,10 +237,7 @@ class Crimson(object):
             print "Couldn't Escape!"
 
     def enemy_turn(self):
-        self.bs_selected_button = None
-        self.bs_selected_action = None
-        self.bs_selected_ally =   None
-        self.bs_button_state = 0
+        self.update_bs_buttons()
         self.turn[1] = "Enemy"
         print
         enemies_by_speed = []
@@ -221,17 +248,18 @@ class Crimson(object):
                     enemies_by_speed.append(enemy)
         enemies_by_speed.sort(key=lambda entity: entity.get_stat("agi"), reverse=True)
         for enemy in enemies_by_speed:
-            targets, attacks = [], []
-            for x in self.party:
-                if x is not None:
-                    if self.allies[x].can_battle():
-                        targets.append(self.allies[x])
-            for x in enemy.attack_list:
-                if x is not None:
-                    attacks.append(x)
-            target = targets[random.randint(0, len(targets) - 1)]
-            attack = attacks[random.randint(0, len(attacks) - 1)]
-            attack.use(enemy, target)
+            if self.can_player_battle() and self.can_enemy_battle():
+                targets, attacks = [], []
+                for x in self.party:
+                    if x is not None:
+                        if self.allies[x].can_battle():
+                            targets.append(self.allies[x])
+                for x in enemy.attack_list:
+                    if x is not None:
+                        attacks.append(x)
+                target = targets[random.randint(0, len(targets) - 1)]
+                attack = attacks[random.randint(0, len(attacks) - 1)]
+                attack.use(enemy, target)
         if self.can_player_battle() and self.can_enemy_battle():
             self.player_turn()
 
@@ -240,7 +268,7 @@ class Crimson(object):
             print "\nYou have defeated the enemy!"
         elif result == "lose":
             print "\nYou have been defeated!"
-            self.quit()
+            # Heal allies, deduct points, etc.
         elif result == "escape":
             print "Got Away Safely!"
         elif result == "enemy_escape":
@@ -258,10 +286,7 @@ class Crimson(object):
             ally.dex_mod = ["+", 0]
             ally.agi_mod = ["+", 0]
             ally.int_mod = ["+", 0]
-        self.bs_selected_button = None
-        self.bs_selected_ally =   None
-        self.bs_selected_action = None
-        self.bs_item_page = 0
+        self.update_bs_buttons()
         self.has_acted = []
 
         self.turn = [0, "Player"]           #### MOVE THIS TO START_BATTLE! ####
@@ -328,7 +353,7 @@ class Crimson(object):
 
         ally = self.lp_selected_ally
 
-        lp_image = ally.get_image(self.frame)
+        lp_image = ally.get_image(self.frame, "lp")
         lp_image = pygame.transform.smoothscale(lp_image, (wp(x=settings.left_panel_x), wp(x=settings.left_panel_x)))
         screen.blit(lp_image, (0, 0))
 
@@ -633,15 +658,15 @@ class Crimson(object):
                                 menu_open = False
                                 load_game(pressed)
                             elif pressed == "Battle" or pressed == "Begin Battle":
-                                enemy_minor_fiend = Entity("Minor Fiend")#, 2)
-                                game.add_enemy(enemy_minor_fiend)
-                                enemy_hornet = Entity("Hornet")#, 25)
-                                game.add_enemy(enemy_hornet)
-                                #enemy_hornet2 = Entity("Hornet")#, 2)
-                                #game.add_enemy(enemy_hornet2)
-                                self.in_battle = True
+                                if self.can_player_battle():
+                                    game.add_enemy(Entity("Minor Fiend"))#, 2))
+                                    game.add_enemy(Entity("Hornet"))#, 25))
+                                    #game.add_enemy(Entity("Hornet"))#, 2))
+                                    self.in_battle = True
+                                    self.player_turn()
+                                else:
+                                    print "There's no will to fight!"
                                 menu_open = False
-                                self.player_turn()
                             elif pressed == "Add Item":
                                 item_name = raw_input("What would you like to add? ")
                                 item_num =  raw_input("How many? ")
@@ -689,19 +714,12 @@ class Crimson(object):
                                         if self.bs_selected_button is not None:
                                             if self.bs_selected_action.can_target(self.bs_selected_ally, self.allies[clicked_ally]):
                                                 self.bs_selected_action.use(self.bs_selected_ally, self.allies[clicked_ally])
-                                                self.bs_selected_button = None
-                                                self.bs_selected_action = None
-                                                self.bs_selected_ally =   None
-                                                self.bs_button_text =     self.get_button_text(0)
-                                                self.bs_button_state =    0
+                                                self.update_bs_buttons()
                                         else:
                                             if self.allies[clicked_ally] not in self.has_acted:
                                                 if self.allies[clicked_ally].can_battle():
                                                     self.bs_selected_ally = self.allies[clicked_ally]
-                                                    self.bs_button_text = self.get_button_text(1)
-                                                    self.bs_button_state = 1
-                                                    self.bs_selected_button = None
-                                                    self.bs_selected_action = None
+                                                    self.update_bs_buttons(1)
                                 # Enemy selected.
                                 elif pressed[1] >= 0 and pressed[1] < 3:
                                     if self.enemies[pressed[1]] is not None:
@@ -709,11 +727,7 @@ class Crimson(object):
                                         if self.bs_selected_button is not None:
                                             if self.bs_selected_action.can_target(self.bs_selected_ally, self.enemies[pressed[1]]):
                                                 self.bs_selected_action.use(self.bs_selected_ally, self.enemies[pressed[1]])
-                                                self.bs_selected_button = None
-                                                self.bs_selected_action = None
-                                                self.bs_selected_ally =   None
-                                                self.bs_button_text =     self.get_button_text(0)
-                                                self.bs_button_state =    0
+                                                self.update_bs_buttons()
                             elif pressed[0] == "bs_button":
                                 # Choose Attacks, Skills, Items, or Standby.
                                 if self.bs_button_state == 1:
@@ -746,11 +760,7 @@ class Crimson(object):
                                         else:
                                             if self.bs_selected_action.can_target(self.bs_selected_ally, None):
                                                 self.bs_selected_action.use(self.bs_selected_ally)
-                                                self.bs_selected_action = None
-                                                self.bs_selected_button = None
-                                                self.bs_selected_ally =   None
-                                                self.bs_button_text =     self.get_button_text(0)
-                                                self.bs_button_state =    0
+                                                self.update_bs_buttons()
                                 # Choose between available Skills.
                                 elif self.bs_button_state == 3:
                                     if self.bs_selected_ally.skill_list[pressed[1]] is not None:
@@ -761,11 +771,7 @@ class Crimson(object):
                                         else:
                                             if self.bs_selected_action.can_target(self.bs_selected_ally, None):
                                                 self.bs_selected_action.use(self.bs_selected_ally)
-                                                self.bs_selected_action = None
-                                                self.bs_selected_button = None
-                                                self.bs_selected_ally =   None
-                                                self.bs_button_text =     self.get_button_text(0)
-                                                self.bs_button_state =    0
+                                                self.update_bs_buttons()
                                 # Choose between available Items.
                                 elif self.bs_button_state == 4:
                                     # Next/First page.
@@ -786,17 +792,9 @@ class Crimson(object):
                                             else:
                                                 if self.bs_selected_action.can_target(self.bs_selected_ally, None):
                                                     self.bs_selected_action.use(self.bs_selected_ally)
-                                                    self.bs_selected_action = None
-                                                    self.bs_selected_button = None
-                                                    self.bs_selected_ally =   None
-                                                    self.bs_button_text =     self.get_button_text(0)
-                                                    self.bs_button_state =    0
+                                                    self.update_bs_buttons()
                         else:
-                            self.bs_button_state =    0
-                            self.bs_selected_ally =   None
-                            self.bs_button_text =     self.get_button_text(0)
-                            self.bs_selected_button = None
-                            self.bs_selected_action = None
+                            self.update_bs_buttons()
                     # On right click.
                     elif mouse_button == 3:
                         # Nothing selected.
@@ -813,15 +811,13 @@ class Crimson(object):
                         elif self.bs_button_state == 2 or self.bs_button_state == 3 or self.bs_button_state == 4:
                             # Action already selected.
                             if self.bs_selected_button is not None:
-                                self.bs_selected_button = None
-                                self.bs_selected_action = None
+                                self.update_bs_buttons(self.bs_button_state)
                             # Action not yet selected.
                             elif self.bs_item_page > 0:
                                 self.bs_item_page -= 1
                                 self.bs_button_text = self.get_button_text(4, self.bs_item_page)
                             else:
-                                self.bs_button_state = 1
-                                self.bs_button_text =  self.get_button_text(1)
+                                self.update_bs_buttons(1)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.menu_open = True
@@ -925,6 +921,14 @@ class Crimson(object):
                     self.on_title = False
                     self.menu_open = False
 
+    def update_bs_buttons(self, state=0):
+        if state == 0:
+            self.bs_selected_ally = None
+        self.bs_selected_button =   None
+        self.bs_selected_action =   None
+        self.bs_button_state = state
+        self.bs_button_text = self.get_button_text(state)
+
 class Entity(object):
     def __init__(self, name, lvl=1, team="none"):
         object.__init__(self)
@@ -947,34 +951,37 @@ class Entity(object):
             img_ext = entities[name]["image_extension"]
             if os.path.exists(img_path):
                 for img_type in settings.entity_img_types:
-                    entity_images[self.original_name][img_type] = []
+                    entity_images[self.original_name][img_type] = [[], []]
                     path = img_path + img_type + "\\"
                     if os.path.exists(path):
                         num, cont = 1, True
                         while cont:
                             file = path + str(num) + img_ext
                             if os.path.isfile(file):
-                                entity_images[self.original_name][img_type].append(pygame.image.load(file))
-                                entity_images[self.original_name][img_type][num-1] = pygame.transform.smoothscale(entity_images[self.original_name][img_type][num-1], wp(settings.bs_id_box_x, settings.bs_id_box_y))
+                                entity_images[self.original_name][img_type][0].append(pygame.image.load(file))
+                                entity_images[self.original_name][img_type][1].append(pygame.transform.smoothscale(entity_images[self.original_name][img_type][0][num-1], wp(settings.bs_id_box_x, settings.bs_id_box_y)))
                             else:
                                 cont = False
                             num += 1
-                    elif img_type != "full_health":
-                        entity_images[self.original_name][img_type] = entity_images[self.original_name]["full_health"]
+                    elif img_type == "full_health":
+                        entity_images[self.original_name][img_type][0].append(pygame.image.load(img_dir + "default.png"))
+                        entity_images[self.original_name][img_type][1].append(pygame.transform.smoothscale(entity_images[self.original_name][img_type][0][0], wp(settings.bs_id_box_x, settings.bs_id_box_y)))
                     else:
-                        entity_images[self.original_name][img_type].append(pygame.image.load(img_dir + "default.png"))
-                        entity_images[self.original_name][img_type][0] = pygame.transform.smoothscale(entity_images[self.original_name][img_type][0], wp(settings.bs_id_box_x, settings.bs_id_box_y))
-            elif os.path.isfile(img_dir + self.original_name + ".png"):
-                file = pygame.image.load(img_dir + self.original_name + ".png")
-                for img_type in settings.entity_img_types:
-                    if img_type != "full_health":
-                        entity_images[self.original_name][img_type] = entity_images[self.original_name]["full_health"]
-                    else:
-                        entity_images[self.original_name][img_type] = [pygame.transform.smoothscale(file, wp(settings.bs_id_box_x, settings.bs_id_box_y))]
+                        entity_images[self.original_name][img_type][0].append(entity_images[self.original_name]["full_health"][0][0])
+                        entity_images[self.original_name][img_type][1].append(entity_images[self.original_name]["full_health"][1][0])
             else:
+                if os.path.isfile(img_dir + self.original_name + ".png"):
+                    file = pygame.image.load(img_dir + self.original_name + ".png")
+                else:
+                    file = pygame.image.load(img_dir + "default.png")
                 for img_type in settings.entity_img_types:
-                    entity_images[self.original_name][img_type] = [pygame.image.load(img_dir + "default.png")]
-                    entity_images[self.original_name][img_type][0] = pygame.transform.smoothscale(entity_images[self.original_name][img_type][0], wp(settings.bs_id_box_x, settings.bs_id_box_y))
+                    entity_images[self.original_name][img_type] = [[], []]
+                    if img_type == "full_health":
+                        entity_images[self.original_name][img_type][0].append(file)
+                        entity_images[self.original_name][img_type][1].append(pygame.transform.smoothscale(file, wp(settings.bs_id_box_x, settings.bs_id_box_y)))
+                    else:
+                        entity_images[self.original_name][img_type][0].append(entity_images[self.original_name]["full_health"][0][0])
+                        entity_images[self.original_name][img_type][1].append(entity_images[self.original_name]["full_health"][1][0])
 
         # Load these.
         self.base_health =       entities[name]["base_health"]
@@ -1026,13 +1033,17 @@ class Entity(object):
         self.health = self.max_health
         self.energy = self.max_energy
 
-    def get_image(self, frame):
+    def get_image(self, frame, size="bs"):
         img_frame = lambda frame, wait, num_imgs: int(frame / (wait / float(num_imgs))) % num_imgs
+        if size == "bs":
+            size = 1
+        else:
+            size = 0
         if self.is_fainted:
             status = "fainted"
         else:
             status = "full_health"
-        return entity_images[self.original_name][status][img_frame(frame, settings.entity_animation_wait, len(entity_images[self.original_name][status]))]
+        return entity_images[self.original_name][status][size][img_frame(frame, settings.entity_animation_wait, len(entity_images[self.original_name][status][size]))]
 
     def take_damage(self, amount):
         amount = int(round(amount))
@@ -1410,7 +1421,6 @@ def start_game(data=None):
         #hornet = Entity("Hornet")
         #game.add_ally(hornet)
         game.running = True
-        #game.in_battle = True
 
 start_game()
 print "Done"
