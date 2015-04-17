@@ -1,0 +1,10 @@
+{Name:0}     {EP Cost:1} {Targetable:2}  {Effects:3}
+{Default}    {4}         {[enemy]}       {[]} 
+{Confuse}    {4}         {[enemy]}       {[]} 
+{Swarm}      {6}         {[]}            {[]} 
+{Run Away}   {0}         {[]}            {[escape(40)]} 
+{Intimidate} {3}         {[enemy]}       {[def_mod(-5), agi_mod(+2)]} 
+{Paranoia}   {6}         {[enemy]}       {[str_mod(-3), def_mod(+3), dex_mod(-3), agi_mod(-3), int_mod(-3)]} 
+{Attack Up}  {6}         {[ally, self]}  {[str_mod(+5)]} 
+{Hover}      {4}         {[self]}        {[evasive_mod(physical -1.0)]}
+{Charge}     {0}         {[self]}        {[use_energy(-0.5)]}

@@ -1,0 +1,8 @@
+{Name:0}        {Targetable:1}   {Effects:2}
+{Default}       {[]}             {[]}
+{Health Potion} {[ally, self]}   {[hp_mod(20)}
+{Energy Potion} {[ally, self]}   {[ep_mod(+20)]}
+{Smoke Bomb}    {[]}             {[escape(70)]}
+{Small Stone}   {[ally, enemy]}  {[hp_mod(-5)]}
+{Energy Drain}  {[ally, enemy]}  {[ep_mod(-5)]}
+{Revival Token} {[fainted_ally]} {[hp_mod(+10)]}

@@ -4,7 +4,7 @@ bs_button_state:
  2 - Attacks
  3 - Skills
  4 - Items
- 5 - Run Away
+ 5 - Are You Sure? (Not Implemented)
 Effects: (Will be applied to "target")
  - ["health_mod",amount] (positive numbers to increase)
  - ["energy_mod",amount] (negative numbers to decrease)
@@ -18,16 +18,17 @@ TO DO:
  - Add automatic turn-change when all allies have moved.
  - Add Crimson.effect(self, effect, user, target)
  - Make bars change slowly.
-   - Make the while running loop activate a function in Crimson for each frame.
+   - Make the while running loop activate a function in Crimson for each frame?
  - Test "Int" and "Elm" Attack types.
  - Test "all_enemies" and "all_allies" targets.
- - Add name changing.
+ - Add name changing.
+ - Add popup for skill/attack/item information
+ - Add ability to walk in front/behind things (by y-position)
 CURRENT BUGS:
- - Stats with modifiers don't fit correctly at high levels (left_panel)
- - Game closes on player defeat.
+ - Stats with modifiers don't fit correctly at high levels (left_panel)
 LONG-TERM TO DO:
  - Add something resembling a story.
- - Browse for picture to associate with current name. (Auto rename and put in images folder.)
+ ? Browse for picture to associate with current name. (Auto rename and put in images folder.)
  - Upload save information to MySQL, to be displayed on Crimson Domain.
  - Abort execution and notify user if important file is not found.
 NOTES:
@@ -46,6 +47,8 @@ NOTES:
    - Fire
    - Water
    - Earth
+   - Poison
+   - Wind
  - Alignments:
    - Good: Adds weakness to Dark, resistance to Light. Allows use of Holy.
    - Neutral: Resists taunts by extremists.
@@ -62,3 +65,13 @@ NOTES:
    - Rogue: Strong Elemental.
 https://www.python.org/ftp/python/2.7.9/python-2.7.9.msi
 http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi
+
+IMMEDIATE PLAN:
+ - Add Section of text box to the right for save, load, q.save, q.load, options.
+ - Add drag and drop of immediate party members.
+ - Add situational backgrounds.
+ - Make decision about whether to have a map and how to make it work.
+ - Import CDAT reader from renpy ver.
+
+DESIGN:
+- Finish Blue_Water Designing if approved.

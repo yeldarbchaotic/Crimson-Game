@@ -1,0 +1,10 @@
+{Name:0}      {DMG:1} {ACC:2} {Type:3}    {Element:4} {EP Cost:5} {Targetable:6}
+{Default}     {1}     {100}   {physical}  {None}      {1}         {[enemy]}
+{Tackle}      {3}     {90}    {physical}  {None}      {2}         {[enemy]}
+{Purge}       {8}     {50}    {elemental} {Dark}      {12}        {[all_enemies]}
+{Punch}       {3}     {90}    {physical}  {None}      {2}         {[enemy]}
+{Bite}        {4}     {90}    {physical}  {Dark}      {2}         {[enemy]}
+{Sting}       {2}     {100}   {physical}  {Poison}    {2}         {[enemy]}
+{Swipe}       {4}     {70}    {physical}  {None}      {2}         {[enemy]}
+{Energy Beam} {7}     {95}    {elemental} {Electric}  {-1}        {[enemy]}
+{Test}        {1}     {-1}    {mental}    {None}      {1}         {[enemy]}

@@ -24,16 +24,16 @@ v0.0.2
 v0.0.3
  * Improved targetting
  * Improved damage equation
- - Fixed bug with revival tokens being usable on living allies
+ * Fixed bug with revival tokens being usable on living allies
  - Removed installer for now
 v0.0.3a
- - Fixed visual bug on revive
+ * Fixed visual bug on revive
 v0.0.4
  * Items now do fixed damage
- - Fixed bug with menu opening after load
+ * Fixed bug with menu opening after load
  + Added ability to gain new items
  * Improved saving/loading of items
- - Fixed bug when using Escape to open menu
+ * Fixed bug when using Escape to open menu
  * Window now says correct version number
  + Added animation for Hornet
 v0.0.5
@@ -58,3 +58,33 @@ v0.0.6
 v0.0.6a
  * Improved targeting system
  * Improved performance while in battle
+v0.0.7
+ * Completely rewrote image rendering
+ + Added visual novel style dialog box
+ + Added facial expressions
+ * Made images smaller (700x700)
+ * Reduced number of images stored in memory
+ * Added setting for menu color
+ + Added transparency support to color converter function
+ * Improved aspect ratio support functions
+v0.0.8:
+ + Added movement
+ + Added sprites
+ + Added title screen
+ + Added maps
+ + Added sprite transparency
+ + Added limited sprite partial transparency
+ + Added Florwil
+ * Replaced .json files with .cdat files
+ + Added sprite for Minor Fiend
+ + Added sprite for Florwil
+ + Added several new .cdat files
+ + Added Blocks
+ + Added dirt block
+ + Added sand block
+ + Added gravel block
+ + Added stone block
+ + Added snow block
+ + Added Green Bush world sprite
+ + Added water sprite (Will be block)
+ + Added sprite_error.png

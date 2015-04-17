@@ -1,0 +1,6 @@
+{Name:0}      {HP:1} {EP:2} {STR:3} {DEF:4} {DEX:5} {AGI:6} {INT:7} {Element:8} {Attacks:9}            {Skills:10}             {Frames:11}     {Delay:12} {Expressions:13}  {Name Color:14} {Text Color:15}
+{Default}     {5}    {5}    {3}     {3}     {3}     {3}     {3}     {None}      {[Punch]}              {[Run Away]}            {[1]}           {.2}       {[none]}          {#000000#}      {none}
+{Player}      {5}    {5}    {3}     {3}     {3}     {3}     {3}     {None}      {[Punch]}              {[Run Away, Attack Up]} {[1]}           {.2}       {[none]}          {#00FF00#}      {none}
+{Minor Fiend} {5}    {6}    {4}     {4}     {6}     {4}     {5}     {Dark}      {[Bite]}               {[Confuse, Paranoia]}   {[1, 2, 3, 2]}  {.2}       {[deadpan, joke]} {#FF0000#}      {none}
+{Hornet}      {3}    {6}    {5}     {3}     {7}     {7}     {2}     {Poison}    {[Sting]}              {[Swarm, Intimidate]}   {[1, 2, 3, 2]}  {.05}      {[calm]}          {#C3C300#}      {none}
+{Florwil}     {4}    {4}    {3}     {6}     {3}     {3}     {5}     {None}      {[Swipe, Energy Beam]} {[Hover, Charge]}       {[1]}           {.2}       {[sad]}           {#AAAAAA#}      {none}

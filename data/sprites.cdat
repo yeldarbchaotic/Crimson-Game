@@ -1,0 +1,7 @@
+{Name:0}      {Type:1} {Width:2} {Height:3} {Default:4} {Movement:5}
+{Player}      {Entity} {64}      {64}       {Idle_Down} {[Walk]}
+{Minor Fiend} {Entity} {64}      {64}       {Idle_Down} {[Walk]}
+{Hornet}      {Entity} {64}      {64}       {Idle_Down} {[Fly]}
+{Florwil}     {Entity} {64}      {64}       {Idle_Down} {[Fly]}
+{Green Bush}  {World}  {64}      {64}       {Idle_Down} {[]}
+{Blue Water}  {World}  {64}      {64}       {Idle_Down} {[]}
