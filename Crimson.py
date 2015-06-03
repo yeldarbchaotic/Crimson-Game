@@ -187,6 +187,7 @@ img_dir = lambda fname="": main_dir("images\\{}".format(fname))
 save_dir = lambda fname="": main_dir("save\\{}".format(fname))
 logo =       pygame.image.load(img_dir("Logo.png")).convert_alpha()
 background = pygame.transform.smoothscale(pygame.image.load(img_dir("Background.png")), settings.win_size).convert()
+title_bg =   pygame.transform.smoothscale(pygame.image.load(img_dir("Title.png")), settings.win_size).convert()
 
 def simplify(string):
     #print "Receive: {}".format(repr(string)) #DEBUG
@@ -913,6 +914,8 @@ class Crimson(object):
 
             if self.in_battle:
                 self.draw_battle_screen()
+            elif self.on_title:
+                self.draw_title_screen()
             else:
                 self.draw_story_screen()
             screen.blit(menu_popup, menu_popup_rect) # Shade area before drawing border.
@@ -1181,10 +1184,14 @@ class Crimson(object):
                 saved_games[file_name.strip("csav").strip(".")] = save_dir(file_name)
 
     def title_screen(self):
+        self.draw_title_screen()
+        pygame.display.flip()
+    
+    def draw_title_screen(self):
         self.title_button, self.title_button_text, self.title_button_text_rect, self.title_button_state = [], [], [], 0
         #(pygame.Rect(wp(40, 50), wp(20, 10)))
 
-        screen.blit(background, (0, 0))
+        screen.blit(title_bg, (0, 0))
         
         for x in xrange(4):
             index_button = pygame.Surface(wp(20, 9), pygame.SRCALPHA, 32)
@@ -1199,8 +1206,6 @@ class Crimson(object):
         title = font.render("This will be the title screen.", True, BLACK)
         title_rect = title.get_rect(topleft=wp(settings.left_panel_x + 2, settings.top_panel_y + 4))
         screen.blit(title, title_rect)
-        
-        pygame.display.flip()
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -1213,7 +1218,7 @@ class Crimson(object):
                     if pressed is not None:
                         if pressed[0] == "title_button":
                             #print settings.title_buttons[pressed[1]] #TEMP
-                            # New Game
+                            # New Game:
                             if pressed[1] == 0:
                                 self.on_title = False
                                 self.in_world = True
@@ -1224,8 +1229,14 @@ class Crimson(object):
                                 self.draw_sprites.append(Sprite("Green Bush", (576,256)))
                                 for x in blocks:
                                     Blocks[x] = Block(x)
-                            # Quit
-                            if pressed[1] == 3:
+                            # Load Game:
+                            elif pressed[1] == 1:
+                                self.update_profile_list()
+                                self.draw_start_menu("Load:", saved_games.keys() + ["Back"])
+                            # Settings:
+                            #elif pressed[1] == 2:
+                            # Quit:
+                            elif pressed[1] == 3:
                                 self.quit()
                 elif mouse_button == RMB:
                     self.on_title = False
@@ -1342,9 +1353,8 @@ class Entity(object):
 
         if name not in entities:
             print "{} is not a valid entity name!".format(name)
-            name = "default"
+            name = "Default"
 
-        self.default_expression = entities[name]["expressions"][0]
         on = self.original_name
         if not self.original_name in entity_images:
             entity_images[on] = {"base":[]}
@@ -1362,6 +1372,7 @@ class Entity(object):
             else:
                 entity_images[on]["base"].append(pygame.image.load(img_dir("default.png")).convert_alpha())
 
+            self.default_expression = copy(entities[name]["expressions"][0])
             for img_type in entities[name]["expressions"] + settings.entity_img_types:
                 entity_images[on][img_type] = []
                 file = img_path("{}{}".format(img_type, img_ext))
@@ -1552,7 +1563,7 @@ class Attack(object):
 
         if name not in attacks:
             print "{} is not a valid attack name!".format(name)
-            name = "default"
+            name = "Default"
 
         self.damage =             copy(attacks[name]["damage"])
         self.accuracy =           copy(attacks[name]["accuracy"])    # For a 25% chance, enter 25. Definite hit is -1.
@@ -1634,7 +1645,7 @@ class Skill(object):
 
         if name not in skills:
             print "{} is not a valid skill name!".format(name)
-            name = "default"
+            name = "Default"
 
         self.energy_cost =        copy(skills[name]["energy_cost"]) # Skills cannot increase self.energy, only items can.
         self.target =             copy(skills[name]["target"])      # "ally", "all_allies", "fainted_ally", "enemy", "all_enemies", "fainted_enemy", "self", or empty. # Maybe "closest_enemy" and "furthest_enemy"?
@@ -1706,7 +1717,7 @@ class Item(object):
 
         if name not in items:
             print "{} is not a valid item name!".format(name)
-            name = "default"
+            name = "Default"
 
         self.target =             copy(items[name]["target"])
         self.effect =             copy(items[name]["effect"])
@@ -1780,7 +1791,7 @@ class Sprite(object):
         
         if name not in sprites:
             print "{} is not a valid sprite name!".format(name)
-            name = "default"
+            name = "Default"
 
         self.type =     copy(sprites[name]["type"])
         self.width =    copy(sprites[name]["width"])
@@ -1866,24 +1877,21 @@ class Location(object):
         
         if name not in locations:
             print "{} is not a valid location name!".format(name)
-            name = "default"
+            name = "Default"
 
         tmp_blocks =   copy(locations[name]["blocks"])
-        print locations[name]["blocks"]
         self.border =  copy(locations[name]["border"])
         self.sprites = copy(locations[name]["sprites"])
         self.items =   copy(locations[name]["items"])
-        #print tmp_blocks
         
         self.blocks = []
         for y in xrange(len(tmp_blocks)):
-            #print tmp_blocks[y]
             tmp_blocks[y] = tmp_blocks[y].split(" ")
             for x in xrange(len(tmp_blocks[y])):
                 if x >= len(self.blocks):
                     self.blocks.append([])
                 self.blocks[x].append(int(tmp_blocks[y][x]))
-        print locations[name]["blocks"]
+        del tmp_blocks
 
 class Block(object):
     def __init__(self, id):

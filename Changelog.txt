@@ -67,7 +67,7 @@ v0.0.7
  * Added setting for menu color
  + Added transparency support to color converter function
  * Improved aspect ratio support functions
-v0.0.8:
+v0.0.8
  + Added movement
  + Added sprites
  + Added title screen
@@ -88,3 +88,8 @@ v0.0.8:
  + Added Green Bush world sprite
  + Added water sprite (Will be block)
  + Added sprite_error.png
+v0.0.8a
+ * Fixed bug when loading
+ + Added quit button to title screen
+ + Added title screen background
+ + Added load button to title screen
