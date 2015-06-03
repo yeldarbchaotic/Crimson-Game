@@ -1213,6 +1213,7 @@ class Crimson(object):
                     if pressed is not None:
                         if pressed[0] == "title_button":
                             #print settings.title_buttons[pressed[1]] #TEMP
+                            # New Game
                             if pressed[1] == 0:
                                 self.on_title = False
                                 self.in_world = True
@@ -1223,7 +1224,8 @@ class Crimson(object):
                                 self.draw_sprites.append(Sprite("Green Bush", (576,256)))
                                 for x in blocks:
                                     Blocks[x] = Block(x)
-                            if pressed[1] == 1:
+                            # Quit
+                            if pressed[1] == 3:
                                 self.quit()
                 elif mouse_button == RMB:
                     self.on_title = False
@@ -1373,14 +1375,14 @@ class Entity(object):
                         entity_images[on][img_type] = pygame.image.load(img_dir("default.png")).convert_alpha()
 
         # Load these.
-        self.base_health =       entities[name]["base_health"]
-        self.base_energy =       entities[name]["base_energy"]
-        self.base_strength =     entities[name]["base_strength"]
-        self.base_defense =      entities[name]["base_defense"]
-        self.base_dexterity =    entities[name]["base_dexterity"]
-        self.base_agility =      entities[name]["base_agility"]
-        self.base_intelligence = entities[name]["base_intelligence"]
-        self.element =           entities[name]["element"]
+        self.base_health =       copy(entities[name]["base_health"])
+        self.base_energy =       copy(entities[name]["base_energy"])
+        self.base_strength =     copy(entities[name]["base_strength"])
+        self.base_defense =      copy(entities[name]["base_defense"])
+        self.base_dexterity =    copy(entities[name]["base_dexterity"])
+        self.base_agility =      copy(entities[name]["base_agility"])
+        self.base_intelligence = copy(entities[name]["base_intelligence"])
+        self.element =           copy(entities[name]["element"])
         self.attack_list =       [None, None, None, None]
         self.skill_list =        [None, None, None, None]
 
@@ -1552,12 +1554,12 @@ class Attack(object):
             print "{} is not a valid attack name!".format(name)
             name = "default"
 
-        self.damage =             attacks[name]["damage"]
-        self.accuracy =           attacks[name]["accuracy"]        # For a 25% chance, enter 25. Definite hit is -1.
-        self.type =               attacks[name]["type"]            # "Str", "Int", "Elm"
-        self.element =            attacks[name]["element"]         # "N/A", "Psn", "Drk"
-        self.energy_cost =        attacks[name]["energy_cost"]
-        self.target =             attacks[name]["target"]          # Always "enemy" or "all_enemies"?
+        self.damage =             copy(attacks[name]["damage"])
+        self.accuracy =           copy(attacks[name]["accuracy"])    # For a 25% chance, enter 25. Definite hit is -1.
+        self.type =               copy(attacks[name]["type"])        # "Str", "Int", "Elm"
+        self.element =            copy(attacks[name]["element"])     # "N/A", "Psn", "Drk"
+        self.energy_cost =        copy(attacks[name]["energy_cost"])
+        self.target =             copy(attacks[name]["target"])      # Always "enemy" or "all_enemies"?
 
     def use(self, user, target=None):
         if user.can_battle():
@@ -1634,9 +1636,9 @@ class Skill(object):
             print "{} is not a valid skill name!".format(name)
             name = "default"
 
-        self.energy_cost =        skills[name]["energy_cost"]      # Skills cannot increase self.energy, only items can.
-        self.target =             skills[name]["target"]           # "ally", "all_allies", "fainted_ally", "enemy", "all_enemies", "fainted_enemy", "self", or empty. # Maybe "closest_enemy" and "furthest_enemy"?
-        self.effect =             skills[name]["effect"]           # See Notes.txt:Effects
+        self.energy_cost =        copy(skills[name]["energy_cost"]) # Skills cannot increase self.energy, only items can.
+        self.target =             copy(skills[name]["target"])      # "ally", "all_allies", "fainted_ally", "enemy", "all_enemies", "fainted_enemy", "self", or empty. # Maybe "closest_enemy" and "furthest_enemy"?
+        self.effect =             copy(skills[name]["effect"])      # See Notes.txt:Effects
         del name, lvl
 
     def use(self, user, target=None):
@@ -1706,8 +1708,8 @@ class Item(object):
             print "{} is not a valid item name!".format(name)
             name = "default"
 
-        self.target =             items[name]["target"]
-        self.effect =             items[name]["effect"]
+        self.target =             copy(items[name]["target"])
+        self.effect =             copy(items[name]["effect"])
         del name, num
 
     def use(self, user, target=None):
@@ -1780,11 +1782,11 @@ class Sprite(object):
             print "{} is not a valid sprite name!".format(name)
             name = "default"
 
-        self.type =     sprites[name]["type"]
-        self.width =    sprites[name]["width"]
-        self.height =   sprites[name]["height"]
-        self.default =  sprites[name]["default"]
-        self.movement = sprites[name]["movement"]
+        self.type =     copy(sprites[name]["type"])
+        self.width =    copy(sprites[name]["width"])
+        self.height =   copy(sprites[name]["height"])
+        self.default =  copy(sprites[name]["default"])
+        self.movement = copy(sprites[name]["movement"])
         
         for x in sprite_acts:
             for y in sprite_dirs:
@@ -1866,18 +1868,22 @@ class Location(object):
             print "{} is not a valid location name!".format(name)
             name = "default"
 
-        tmp_blocks =   locations[name]["blocks"]
-        self.border =  locations[name]["border"]
-        self.sprites = locations[name]["sprites"]
-        self.items =   locations[name]["items"]
+        tmp_blocks =   copy(locations[name]["blocks"])
+        print locations[name]["blocks"]
+        self.border =  copy(locations[name]["border"])
+        self.sprites = copy(locations[name]["sprites"])
+        self.items =   copy(locations[name]["items"])
+        #print tmp_blocks
         
         self.blocks = []
         for y in xrange(len(tmp_blocks)):
+            #print tmp_blocks[y]
             tmp_blocks[y] = tmp_blocks[y].split(" ")
             for x in xrange(len(tmp_blocks[y])):
                 if x >= len(self.blocks):
                     self.blocks.append([])
                 self.blocks[x].append(int(tmp_blocks[y][x]))
+        print locations[name]["blocks"]
 
 class Block(object):
     def __init__(self, id):
@@ -1886,9 +1892,9 @@ class Block(object):
             id = 0
         self.id = id
 
-        self.name =     blocks[self.id]["name"]
-        self.type =     blocks[self.id]["type"]
-        self.movement = blocks[self.id]["movement"]
+        self.name =     copy(blocks[self.id]["name"])
+        self.type =     copy(blocks[self.id]["type"])
+        self.movement = copy(blocks[self.id]["movement"])
 
         img = img_dir("World\\{}\\{}.jpg".format(self.type, self.name.replace(" ", "_")))
 
