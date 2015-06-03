@@ -4,4 +4,3 @@
 {Hornet}      {Entity} {64}      {64}       {Idle_Down} {[Fly]}
 {Florwil}     {Entity} {64}      {64}       {Idle_Down} {[Fly]}
 {Green Bush}  {World}  {64}      {64}       {Idle_Down} {[]}
-{Blue Water}  {World}  {64}      {64}       {Idle_Down} {[]}

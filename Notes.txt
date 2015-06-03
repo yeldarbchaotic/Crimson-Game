@@ -75,3 +75,4 @@ IMMEDIATE PLAN:
 
 DESIGN:
 - Finish Blue_Water Designing if approved.
+- Make copy of water and make it 32*32

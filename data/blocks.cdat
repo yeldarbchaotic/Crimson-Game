@@ -1,6 +1,9 @@
-{ID:0} {Name:1}     {Type:2}  {Movement:3}
-{0}    {Dirt}       {terrain} {[Walk, Fly]}
-{1}    {Sand}       {terrain} {[Walk, Fly]}
-{2}    {Gravel}     {terrain} {[Walk, Fly]}
-{3}    {Flat Stone} {terrain} {[Walk, Fly]}
-{4}    {Snow}       {terrain} {[Walk, Fly]}
+{ID:0} {Name:1}              {Type:2}  {Movement:3}
+{0}    {Dirt}                {terrain} {[Walk, Fly]}
+{1}    {Sand}                {terrain} {[Walk, Fly]}
+{2}    {Gravel}              {terrain} {[Walk, Fly]}
+{3}    {Flat Stone}          {terrain} {[Walk, Fly]}
+{4}    {Snow}                {terrain} {[Walk, Fly]}
+{5}    {Water}               {terrain} {[Swim, Fly]}
+{6}    {Grass}               {terrain} {[Walk, Fly]}
+{7}    {UpHalf_StoneWalkway} {terrain} {[Walk, Fly]}

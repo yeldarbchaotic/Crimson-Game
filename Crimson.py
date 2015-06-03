@@ -189,13 +189,13 @@ logo =       pygame.image.load(img_dir("Logo.png")).convert_alpha()
 background = pygame.transform.smoothscale(pygame.image.load(img_dir("Background.png")), settings.win_size).convert()
 
 def simplify(string):
-    print "Receive: {}".format(repr(string)) #DEBUG
+    #print "Receive: {}".format(repr(string)) #DEBUG
     nums = ["0","1","2","3","4","5","6","7","8","9"]
     if len(string) > 0 and type(string) is str:
         while string[0] == " " or string[0] == "\t":
 	    string = string[1:]
 	    if len(string) == 0:
-		print 'Return: ""'
+		#print 'Return: ""'
 		return ""
         if string[0] == "[" and string[-1] == "]":
             if string == "[]":
@@ -219,7 +219,7 @@ def simplify(string):
         elif string[0] in nums + [".", "-", "+"]:
             for char in string[1:]:
                 if char not in nums + ["."]:
-                    print "Return: {}".format(repr(string)) #DEBUG
+                    #print "Return: {}".format(repr(string)) #DEBUG
                     return string
             if string.find(".") != -1:
                 if string.count(".") == 1:
@@ -233,7 +233,7 @@ def simplify(string):
                 string = int(string)
         if string == "None" or string == "none":
             string = None
-    print "Return {}".format(repr(string)) #DEBUG
+    #print "Return {}".format(repr(string)) #DEBUG
     return string
 
 def read_cdat(fname):
@@ -242,7 +242,7 @@ def read_cdat(fname):
     bracket_open = False
     for line in dat:
         a = line.split("{")
-        print a
+        #print a
         for x in a:
             if x.find("}") == -1:
                 a.pop(a.index(x))
@@ -260,13 +260,13 @@ def read_cdat(fname):
     dat.close()
     return l
 
-entities =  {}
-attacks =   {}
-skills =    {}
-items =     {}
-sprites =   {}
-locations = {}
-blocks =    {}
+entities, Entities =   {}, {}
+attacks, Attacks =     {}, {}
+skills, Skills =       {}, {}
+items, Items =         {}, {}
+sprites, Sprites =     {}, {}
+locations, Locations = {}, {}
+blocks, Blocks =       {}, {}
 
 raw_entities = read_cdat(data_dir("entities.cdat"))[1:]
 for x in xrange(len(raw_entities)):
@@ -330,10 +330,11 @@ for x in xrange(len(raw_sprites)):
     if len(raw_sprites[x]) > 0:
         n = raw_sprites[x][0]
         sprites[n] = {}
-        sprites[n]["type"] =    raw_sprites[x][1]
-        sprites[n]["width"] =   raw_sprites[x][2]
-        sprites[n]["height"] =  raw_sprites[x][3]
-        sprites[n]["default"] = raw_sprites[x][4]
+        sprites[n]["type"] =     raw_sprites[x][1]
+        sprites[n]["width"] =    raw_sprites[x][2]
+        sprites[n]["height"] =   raw_sprites[x][3]
+        sprites[n]["default"] =  raw_sprites[x][4]
+        sprites[n]["movement"] = raw_sprites[x][5]
 del raw_sprites
 
 raw_locations = read_cdat(data_dir("locations.cdat"))[1:]
@@ -346,7 +347,7 @@ for x in xrange(len(raw_locations)):
         locations[n]["sprites"] = raw_locations[x][3]
         locations[n]["items"] =   raw_locations[x][4]
 del raw_locations
-print locations
+#print locations
 
 raw_blocks = read_cdat(data_dir("blocks.cdat"))[1:]
 for x in xrange(len(raw_blocks)):
@@ -363,8 +364,6 @@ for x in xrange(len(raw_blocks)):
 #FLAT_STONE =       pygame.image.load(img_dir("World\\terrain\\flat_stone.jpg")).convert()
 #SNOW =       pygame.image.load(img_dir("World\\terrain\\snow.jpg")).convert()
 #blocks =     {0:DIRT,1:SAND,2:GRAVEL,3:FLAT_STONE,4:SNOW}
-for x in blocks:
-    blocks[x]["img"] = pygame.image.load(img_dir("World\\{}\\{}.jpg".format(blocks[x]["type"], blocks[x]["name"].replace(" ", "_").lower()))).convert()
 
 # For maintaining aspect ratio when scaling.
 # Usage: pygame.transform.smoothscale(image, x_y(image, new_x) or y_x(image, new_y))
@@ -408,6 +407,7 @@ font = pygame.font.SysFont("Arial", wp(x=settings.font_size_x))
 entity_images = {}
 saved_games = {}
 loaded_sprites = {}
+loaded_blocks =  {}
 sprite_acts = ["Idle", "Walk", "Run"]
 sprite_dirs = ["Down", "Left", "Right", "Up"]
 
@@ -460,7 +460,7 @@ class Crimson(object):
             self.grid.append([])
             for y in xrange(settings.win_size[1] / BLOCK):
                 self.grid[x].append((x*BLOCK,y*BLOCK))
-        self.layer = [[], [], []] # Draw first, second, third.
+        self.draw_sprites = [] # Draw first, second, third.
         self.cur_map = Location("Test")
 
         self.bs_id_box, self.bs_id_health_rect, self.bs_id_energy_rect, self.bs_id_xp_rect, self.bs_id_name_rect, self.bs_id_name = [], [], [], [], [], []
@@ -1216,15 +1216,15 @@ class Crimson(object):
                             if pressed[1] == 0:
                                 self.on_title = False
                                 self.in_world = True
-                                self.layer[0].append(Sprite("Minor Fiend", (64,0)))
-                                self.layer[0].append(Sprite("Florwil", (128,0)))
-                                self.layer[0].append(Sprite("Hornet", (192, 0)))
-                                self.layer[0].append(Sprite("Green Bush", (512,256)))
-                                self.layer[0].append(Sprite("Green Bush", (576,256)))
-                                self.layer[0].append(Sprite("Blue Water", (600,100)))
-                                self.layer[0].append(Sprite("Blue Water", (664,100)))
-                                self.layer[0].append(Sprite("Blue Water", (600,164)))
-                                self.layer[0].append(Sprite("Blue Water", (664,164)))
+                                self.draw_sprites.append(Sprite("Minor Fiend", (64,0)))
+                                self.draw_sprites.append(Sprite("Florwil", (128,0)))
+                                self.draw_sprites.append(Sprite("Hornet", (192, 0)))
+                                self.draw_sprites.append(Sprite("Green Bush", (512,256)))
+                                self.draw_sprites.append(Sprite("Green Bush", (576,256)))
+                                for x in blocks:
+                                    Blocks[x] = Block(x)
+                            if pressed[1] == 1:
+                                self.quit()
                 elif mouse_button == RMB:
                     self.on_title = False
                     self.is_story_time = True
@@ -1266,11 +1266,11 @@ class Crimson(object):
         for x in xrange(len(self.grid)):
             for y in xrange(len(self.grid[x])):
                 if x >= len(self.cur_map.blocks):
-                    screen.blit(blocks[self.cur_map.border], self.grid[x][y])
+                    Blocks[self.cur_map.border].draw(self.grid[x][y], self.frame)
                 elif y >= len(self.cur_map.blocks[x]):
-                    screen.blit(blocks[self.cur_map.border], self.grid[x][y])
+                    Blocks[self.cur_map.border].draw(self.grid[x][y], self.frame)
                 else:
-                    screen.blit(blocks[self.cur_map.blocks[x][y]]["img"], self.grid[x][y])
+                    Blocks[self.cur_map.blocks[x][y]].draw(self.grid[x][y], self.frame)
         if len(self.keys["move"]):
             if SHIFT in self.keys["other"]:
                 debug.player_sprite.set_act("Run", table[self.keys["move"][0]])
@@ -1278,9 +1278,8 @@ class Crimson(object):
                 debug.player_sprite.set_act("Walk", table[self.keys["move"][0]])
         else:
             debug.player_sprite.set_act("Idle")
-        for x in xrange(len(self.layer)):
-            for y in xrange(len(self.layer[x])):
-                self.layer[x][y].draw()
+        for x in xrange(len(self.draw_sprites)):
+            self.draw_sprites[x].draw()
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -1316,13 +1315,15 @@ class Crimson(object):
             STEP = 2
         for i in xrange(len(self.keys["move"])):
             if self.keys["move"][i] == W:
-                debug.player_sprite.pos = (debug.player_sprite.pos[0], debug.player_sprite.pos[1] - (STEP / (i + 1)))
+                new_pos = (debug.player_sprite.pos[0], debug.player_sprite.pos[1] - (STEP / (i + 1)))
             if self.keys["move"][i] == A:
-                debug.player_sprite.pos = (debug.player_sprite.pos[0] - (STEP / (i + 1)), debug.player_sprite.pos[1])
+                new_pos = (debug.player_sprite.pos[0] - (STEP / (i + 1)), debug.player_sprite.pos[1])
             if self.keys["move"][i] == S:
-                debug.player_sprite.pos = (debug.player_sprite.pos[0], debug.player_sprite.pos[1] + (STEP / (i + 1)))
+                new_pos = (debug.player_sprite.pos[0], debug.player_sprite.pos[1] + (STEP / (i + 1)))
             if self.keys["move"][i] == D:
-                debug.player_sprite.pos = (debug.player_sprite.pos[0] + (STEP / (i + 1)), debug.player_sprite.pos[1])
+                new_pos = (debug.player_sprite.pos[0] + (STEP / (i + 1)), debug.player_sprite.pos[1])
+            if Blocks[self.cur_map.blocks[new_pos[0] / 32][new_pos[1] / 32]].can_enter(debug.player_sprite.movement):
+                debug.player_sprite.pos = new_pos
 
 class Entity(object):
     def __init__(self, name, lvl=1, team="none", player=False):
@@ -1368,7 +1369,7 @@ class Entity(object):
                     if entity_images[on].has_key(self.default_expression):
                         entity_images[on][img_type] = entity_images[on][self.default_expression]
                     else:
-                        print "LOADING DEFAULT IMAGE FOR {}".format(self.original_name)
+                        print "Error: No image for {} {}".format(self.original_name, img_type)
                         entity_images[on][img_type] = pygame.image.load(img_dir("default.png")).convert_alpha()
 
         # Load these.
@@ -1441,7 +1442,7 @@ class Entity(object):
             e = "No Image for '{} {}'".format(self.name, expression)
             if not errors.count(e):
                 errors.append(e)
-                print e
+                print e # Add Error function.
             return pygame.Surface(size)
 
     def take_damage(self, amount):
@@ -1646,7 +1647,7 @@ class Skill(object):
                     if target is not None and user is not target:
                         end = " on {}".format(target.name)
                     print msg.format(user.name, self.name, end)
-                    print self.effect, len(self.effect)
+                    #print self.effect, len(self.effect)
                     for x in self.effect:
                         if   x[0] == "health_mod":
                             target.take_damage(x[1] * -1)
@@ -1779,10 +1780,11 @@ class Sprite(object):
             print "{} is not a valid sprite name!".format(name)
             name = "default"
 
-        self.type =    sprites[name]["type"]
-        self.width =   sprites[name]["width"]
-        self.height =  sprites[name]["height"]
-        self.default = sprites[name]["default"]
+        self.type =     sprites[name]["type"]
+        self.width =    sprites[name]["width"]
+        self.height =   sprites[name]["height"]
+        self.default =  sprites[name]["default"]
+        self.movement = sprites[name]["movement"]
         
         for x in sprite_acts:
             for y in sprite_dirs:
@@ -1800,7 +1802,7 @@ class Sprite(object):
             loaded_sprites[self.name] = {}
             for action in sprite_acts:
                 img_pack = self.path("{}{}".format(action, sprite_img_extension))
-                print img_pack
+                #print img_pack
                 if os.path.isfile(img_pack):
                     for direction in sprite_dirs:
                         tmp = pygame.image.load(img_pack)
@@ -1814,13 +1816,13 @@ class Sprite(object):
                 else:
                     for direction in sprite_dirs:
                         folder = "{}_{}".format(action, direction)
-                        print self.path(folder)
+                        #print self.path(folder)
                         loaded_sprites[self.name][folder] = []
                         if os.path.isdir(self.path(folder)):
                             x = 0
                             while True:
                                 file = self.path("{}\\{}{}".format(folder, x, sprite_img_extension))
-                                print file
+                                #print file
                                 if os.path.isfile(file):
                                     loaded_sprites[self.name][folder].append(load_sprite(file))
                                 else:
@@ -1876,6 +1878,39 @@ class Location(object):
                 if x >= len(self.blocks):
                     self.blocks.append([])
                 self.blocks[x].append(int(tmp_blocks[y][x]))
+
+class Block(object):
+    def __init__(self, id):
+        if id not in blocks:
+            print "{} is not a valid block id!".format(id)
+            id = 0
+        self.id = id
+
+        self.name =     blocks[self.id]["name"]
+        self.type =     blocks[self.id]["type"]
+        self.movement = blocks[self.id]["movement"]
+
+        img = img_dir("World\\{}\\{}.jpg".format(self.type, self.name.replace(" ", "_")))
+
+        if not self.id in loaded_blocks:
+            loaded_blocks[self.id] = []
+            if os.path.isfile(img):
+                img = pygame.image.load(img)
+                for x in xrange(0, img.get_width(), BLOCK):
+                    tmp = pygame.Surface((BLOCK, BLOCK))
+                    tmp.blit(img, (0,0), (x, 0, BLOCK, BLOCK))
+                    loaded_blocks[self.id].append(tmp)
+
+    def draw(self, pos, frame):
+        frame = (frame / (40 / len(loaded_blocks[self.id]))) % len(loaded_blocks[self.id])
+        screen.blit(loaded_blocks[self.id][frame], pos)
+        del pos, frame
+
+    def can_enter(self, sprite_movements):
+        for x in sprite_movements:
+            if x in self.movement:
+                return True
+        return False
 
 ### ADD THESE TO ENTITY ###
 def draw_health(entity, health_rect, draw_text=True, rect_outline=2, color=HPRED):
@@ -1971,8 +2006,8 @@ def start_game(data=None):
 
 start_game()
 debug.change_player_sprite("Player")
-debug.change_player_sprite("Blue Water")
-game.layer[1].append(debug.player_sprite)
+#debug.change_player_sprite("Blue Water")
+game.draw_sprites.append(debug.player_sprite)
 print "Done"
 while game.running:
     game.frame += 1
